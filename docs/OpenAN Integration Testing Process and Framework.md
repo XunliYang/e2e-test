@@ -1,6 +1,6 @@
 # OpenAN Integration Testing Process and Framework
 
-> *Version: v0.1 (Draft)*  
+> *Version: v0.2 (Draft, 2026-11-03)*  
 > *Maintained by: OpenAN Integration Testing Working Group*  
 > *Language: English*
 
@@ -83,7 +83,7 @@
 
 **Stage 1: Requirements and Design**
 
-- Test design may begin only after the feature proposal has passed OFEP (OpenAN Feature Enhancement Proposal) review.
+- Test design may begin only after the feature proposal has passed TSC review.
 - Output: Feature test plan (including FIT scope, SIT scope, required environments, data, and schedule).
 
 **Stage 2: Test Design**
@@ -314,7 +314,7 @@ After passing the gate, CI can merge and publish the daily build.
 | **Stability** | Basic stability (7×24h), load stability (7×24h), extended stability (30 days) | Memory leak, performance degradation, restart frequency |
 | **Reliability** | Fault injection, network partition, dependency failure, disk pressure | Auto-recovery, graceful degradation, state consistency |
 | **Security** | TLS/mTLS verification, JWS signature validation, permission isolation, API security scan | OWASP Top 10 compliance |
-| **Compatibility** | Kubernetes versions, OS compatibility, browser compatibility, dependency versions | K8s v1.33-1.35, Ubuntu/CentOS/openEuler, Chrome/Firefox/Edge/Safari |
+| **Compatibility** | Kubernetes versions, OS compatibility, browser compatibility, database backends, dependency versions | Supported range per `openan-installation`: K8s v1.33+ / Helm 3.10+; DB backends: file/SQLite/PostgreSQL/MySQL/GaussDB; certified matrix (e.g., K8s v1.33-1.35, Ubuntu/CentOS/openEuler, Chrome/Firefox/Edge/Safari) is defined in the release test plan |
 | **A2A-T Protocol** | Negotiation state consistency, protocol version compatibility, large payload handling, concurrent negotiation conflict | Client/server state alignment, v1.0/v1.1 interoperability |
 
 **Note**: Detailed performance benchmarks and thresholds are defined in separate test plans, not in this general framework.
@@ -355,6 +355,8 @@ After passing the gate, CI can merge and publish the daily build.
 | `a2a-t-sdk-python` | Python | SDK | UT | pytest | In-repo |
 | `a2a-t-sdk-java` | Java | SDK | UT | JUnit 5 | In-repo |
 | `workflow-engine-sdk-java` | Java | SDK | UT | JUnit 5 | In-repo |
+| `workflow-engine-sdk-python` | Python | SDK | UT | pytest | In-repo |
+| `a2a-t-prompt-templates-spec` | - | Spec | Template spec conformance review | Manual review | In-repo |
 | `orchestration-center` | Python + Node.js | Core Service | UT + FIT | pytest + requests/httpx | `openan-itest` |
 | `registry-center` | Python | Core Service | UT + FIT | pytest + requests/httpx | `openan-itest` |
 | `openan-portal` | JavaScript | Portal | UT + UI Testing | Jest / Vitest + Playwright | `openan-itest/e2e-frontend/` |
@@ -367,5 +369,7 @@ After passing the gate, CI can merge and publish the daily build.
 - **SIT**: Executed by the Integration Testing WG on RC versions, covering multi-service combination scenarios
 
 ---
+
+> *Revision v0.2 (2026-11-03): §12 repository table aligned with the actual project-openan GitHub organization (added `workflow-engine-sdk-python` and `a2a-t-prompt-templates-spec`); §10 compatibility clarified the supported range (K8s v1.25+ / Helm 3.10+ per `openan-installation`) versus the certified matrix defined in release test plans.*
 
 > *This standard draft is maintained by the OpenAN Integration Testing Working Group. Community members are welcome to submit improvements via PR.*

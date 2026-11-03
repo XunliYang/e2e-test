@@ -1,7 +1,7 @@
 # OpenAN测试Checklist
 
 > 版本：v0.3（2026-11-03修订）
-> 基于：[OpenAN Integration Testing Process and Framework](<OpenAN Integration Testing Process and Framework.md>) v0.1
+> 基于：[OpenAN Integration Testing Process and Framework](<OpenAN Integration Testing Process and Framework.md>) v0.2
 > 维护：OpenAN集成测试工作组
 > 适用：特性需求转测验收（TRR）、版本发布测试
 > 术语：FIT（Feature Integration Test，特性集成测试）、SIT（System Integration Test，系统级集成测试）、TRR（Test Readiness Review，特性需求转测验收）、RC（Release Candidate，发布候选版本）、TSC（Technical Steering Committee）、WG（Working Group，工作组）、P0/P1/P2/P3（用例与缺陷优先级，定义见框架§2、§9.1）、AgentCard（A2A-T智能体描述卡片）、PSOP（编排中心工作流定义）、LLM（大语言模型，注册中心语义检索与编排中心意图/工作流生成均依赖外部LLM服务）
