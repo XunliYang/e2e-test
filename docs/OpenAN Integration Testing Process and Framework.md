@@ -1,6 +1,6 @@
 # OpenAN Integration Testing Process and Framework
 
-> *Version: v0.2 (Draft, 2026-11-03)*  
+> *Version: v0.1 (Draft)*  
 > *Maintained by: OpenAN Integration Testing Working Group*  
 > *Language: English*
 
@@ -21,7 +21,7 @@
 **1.2 Scope**
 
 - Applies to all OpenAN community code repositories and the corresponding integration test repository.
-- Applies to all integration testing activities before a community release, including Feature Integration Testing (FIT) and System Integration Testing (SIT).
+- Applies to all integration testing activities before a community release, including Feature Integration Testing (FIT), System Integration Testing (SIT), and specialized testing.
 - Does not replace unit testing (UT) or static code analysis; unit testing is governed by each working group within their module repositories.
 
 **1.3 Audience**
@@ -131,18 +131,18 @@
 
 ### 5.2 Boundaries of Integration Testing
 
-**Included in Integration Testing (FIT/SIT)**
+**Included in Integration Testing (FIT/SIT/Specialized Testing)**
 
 - Cross-module API calls, cross-service data flows, event trigger chains;
 - Installation/upgrade/rollback paths;
 - Multi-feature combination usage (e.g., registry + orchestrate + execute);
-- Validating end-user critical paths on a real Kubernetes cluster or virtual machine.
+- Validating end-user critical paths on a real Kubernetes cluster or virtual machine;
+- Specialized testing: performance, stress, stability, reliability, security, compatibility, A2A-T protocol, etc. (executed by the Integration Testing WG; categories defined in Section 10).
 
 **Not Included in Integration Testing (do not do these at the integration layer)**
 
 - Boundary conditions of individual functions (should be covered in UT);
-- Pure UI layout and styling (belongs to frontend manual/UI automation, not covered by this standard);
-- Large-scale stress/performance benchmarks (belongs to performance specialty testing).
+- Pure UI layout and styling (belongs to frontend manual/UI automation, not covered by this standard).
 
 ---
 
@@ -369,7 +369,5 @@ After passing the gate, CI can merge and publish the daily build.
 - **SIT**: Executed by the Integration Testing WG on RC versions, covering multi-service combination scenarios
 
 ---
-
-> *Revision v0.2 (2026-11-03): §12 repository table aligned with the actual project-openan GitHub organization (added `workflow-engine-sdk-python` and `a2a-t-prompt-templates-spec`); §10 compatibility clarified the supported range (K8s v1.25+ / Helm 3.10+ per `openan-installation`) versus the certified matrix defined in release test plans.*
 
 > *This standard draft is maintained by the OpenAN Integration Testing Working Group. Community members are welcome to submit improvements via PR.*
