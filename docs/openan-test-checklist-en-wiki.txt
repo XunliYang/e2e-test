@@ -1,0 +1,113 @@
+h1. OpenAN Test Checklist
+
+{info:title=Document Info}
+*Version:* v0.1
+*Based on:* [OpenAN Integration Testing Process and Framework v0.1|https://lf-networking.atlassian.net/wiki/spaces/OpenAN/pages/1544945667/OpenAN+Integration+Testing+Process+and+Framework]
+*Maintained by:* OpenAN Integration Testing Working Group
+*Applicable to:* feature handover acceptance (TRR), release testing
+*Language:* English (Chinese version in repository: openan-test-checklist.md)
+*Terminology:* FIT (Feature Integration Test), SIT (System Integration Test), TRR (Test Readiness Review), RC (Release Candidate), TSC (Technical Steering Committee), WG (Working Group), P0/P1/P2/P3 (case and defect priorities, defined in Framework §2 and §9.1)
+{info}
+
+*Core principles: atomicity, repeatability, traceability, completeness, independence*
+
+{note:title=Check Items Are Normative Clauses}
+This checklist only defines "what to check and by which rule". Specific entry gate values are defined in Framework §8; test targets, scenarios, and content are defined in test plans / specialized test plans.
+{note}
+
+----
+
+h2. 1. Feature Handover Acceptance Checklist (TRR)
+
+{quote}
+Executed after feature development is complete and before entering FIT.\\
+*Decision maker:* Feature WG Maintainer\\
+*Executor:* Feature WG test owner\\
+*Dispute arbitration:* TRR disputes are arbitrated by the Integration Testing WG.
+{quote}
+
+||Category||Requirement||Check Item||Rule||Result||Notes||
+|Code & Build|Required|Code merged|*Rule:* All feature-related code has been merged into the main branch, with traceable version identifiers (tag/commit ID)|☐| |
+| |Required|Artifact build|*Rule:* Test artifacts have been built and pushed to the image registry; the artifact list matches the version under test|☐| |
+| |Required|Module-level UT|*Rule:* All module-level UTs pass, based on module repository pipeline/daily build results|☐| |
+| |Required|UT coverage|*Rule:* Meets the Framework §8.4 coverage gate, based on module repository pipeline requirements|☐| |
+| |Required|Deployable & smoke|*Rule:* Artifacts are deployable and all smoke cases pass, based on automated execution results|☐| |
+|Requirements & Test Design|Required|Requirement baseline|*Rule:* The feature proposal/design has passed TSC review; the requirement baseline is frozen|☐| |
+| |Required|Test plan review|*Rule:* The test plan is written per template and has passed review; PR merged into the {{openan-itest}} repo under {{docs/plans/<version>/}}|☐| |
+| |Required|Case conventions|*Rule:* Case IDs, naming, and labels comply with Framework §6.1 and §6.4|☐| |
+| |Required|Case automation|*Rule:* 100% of P0/P1 cases are automated and repeatable; non-automatable cases must state the reason and provide self-test results|☐| |
+| |Required|Case quality|*Rule:* Cases meet Framework §6.3 writing requirements (explicit assertions, no log-only checks, complete cleanup, no sleep or order dependencies); determinism requirements for cases involving external dependencies follow the test plan|☐| |
+|Environment & Data|Required|Environment availability|*Rule:* Test environment availability has been confirmed by the Integration Testing WG|☐| |
+| |Required|Data & dependencies ready|*Rule:* Test data, account permissions, and external dependencies declared in the test plan are ready; external dependencies may be replaced by stubs/mocks per the test plan|☐| |
+|Test Execution|Required|Execution & pass rate|*Rule:* Meets the Framework §8.1 TRR entry gate (case execution rate and pass rates by priority), based on automated execution results|☐| |
+| |Required|Failed case handling|*Rule:* All failed cases have archived issues labeled {{skip-temporarily}}, per Framework §6.4|☐| |
+| |Required|Performance baseline|*Rule:* Key interface performance is not lower than the previous version baseline; baselines are defined in the specialized test plan|☐| |
+| |Required|Evidence retention|*Rule:* Failure evidence (trace/logs/screenshots) is fully preserved, per Framework §6.3|☐| |
+|Documentation & Archiving|Required|Plan & case archiving|*Rule:* The test plan and case table are merged into the {{openan-itest}} repo under {{docs/plans/<version>/}}, per Framework §11.3|☐| |
+| |Required|Test code archiving|*Rule:* Automated cases are merged into the {{openan-itest}} repo under {{e2e/<feature>/}}; new environment variables are synchronized to {{.env.template}} and README, per Framework §6.6|☐| |
+
+*TRR decision:*
+* ☐ Pass, enter FIT
+* ☐ Conditional pass (remaining issue list: ____; issue links: ____; risk acceptor: ____; latest closure version: ____)
+* ☐ Fail, returned to development
+
+*Review record:* review date ____; attendees ____; sign-off ____; evidence links (test report/pipeline/Allure) ____
+
+----
+
+h2. 2. Release Testing Checklist
+
+{quote}
+Used before RC release, during SIT execution, and at the release decision point, executed in gate order: RC entry → test execution → release decision.\\
+*Decision maker:* TSC / Release Manager\\
+*Executor:* Integration Testing WG\\
+*Dispute arbitration:* release disputes are escalated to the TSC.
+{quote}
+
+||Category||Requirement||Check Item||Rule||Result||Notes||
+|Test Environment|Required|Environment baseline|*Rule:* Test environment configuration is verified consistent with the production baseline; coverage scope follows the release test plan|☐| |
+| |Required|Environment verification|*Rule:* The Integration Testing WG has completed environment availability verification|☐| |
+| |Required|Dependent services|*Rule:* All dependent services defined in the release test plan are reachable|☐| |
+|Version Build & Deployment|Required|RC version|*Rule:* RC version number, tag, and changelog are complete, complying with version management conventions|☐| |
+| |Required|Image build|*Rule:* All component images have been built and pushed to the image registry|☐| |
+| |Required|Artifact integrity|*Rule:* Release artifacts are complete (SBOM, image signatures, License inventory), based on pipeline gates and the release artifact list|☐| |
+| |Required|Deployment modes|*Rule:* Installation verification passes for the supported deployment modes defined in the release test plan; out-of-scope modes are explicitly excluded|☐| |
+| |Required|Upgrade & rollback|*Rule:* Upgrade and rollback paths from the previous version pass verification; upgrade operations comply with the deployment contract|☐| |
+|FIT Full Regression|Required|Full execution|*Rule:* Meets the Framework §8.2 FIT exit gate (execution rate, pass rate, failed case handling), based on automated execution results|☐| |
+| |Required|New feature coverage|*Rule:* FIT for all new features in this version has been executed; exit criteria follow Framework §8.2|☐| |
+|SIT|Required|Combined scenarios|*Rule:* Meets the Framework §8.3 SIT exit gate (pass rate, no skips); scenario scope follows the release test plan|☐| |
+| |Required|Exception scenarios|*Rule:* Exception and degradation scenarios pass per the test plan; state is consistent after fault recovery|☐| |
+|Specialized Testing|Required|Test scope|*Rule:* Specialized test types and scope are executed per Framework §10 and the specialized test plans; exit criteria follow the specialized test plans|☐| |
+| |Required|Performance baseline|*Rule:* Key interface performance meets the baseline and is not lower than the previous version; baselines are defined in the specialized test plan|☐| |
+| |Required|Stability & reliability|*Rule:* Stability test duration and pass thresholds follow the specialized test plan; execution passes|☐| |
+| |Required|Security|*Rule:* Security scanning and security feature verification pass; vulnerability exit meets the Framework §8.3 release requirements|☐| |
+| |Required|Compatibility|*Rule:* The compatibility matrix passes per the specialized test plan definition|☐| |
+|Defect Management|Required|Defect exit|*Rule:* Meets Framework §9 defect management requirements: all P0 defects closed, P1 closed or with documented workarounds; handling timelines comply with §9.1|☐| |
+| |Required|Regression verification|*Rule:* Every fix has a corresponding regression case that passes with the fix PR, per Framework §9.2 and §9.3|☐| |
+|Coverage & Traceability|Required|Requirement traceability|*Rule:* 100% of approved requirements have corresponding executed cases|☐| |
+| |Required|Coverage|*Rule:* Meets the Framework §8.4 coverage gate|☐| |
+|Documentation & Release Artifacts|Required|Test report|*Rule:* The test report is written per template, reviewed and approved by the Integration Testing WG, and archived under {{docs/reports/<version>/}}, per Framework §11.3|☐| |
+| |Required|Release documents|*Rule:* Release notes and installation documents match the current version; known issues and workarounds are complete|☐| |
+| |Recommended|Experience environment|*Rule:* Smoke tests pass on the external experience/demo environment (per the declared release scope)|☐| |
+|Release Decision|Required|Quality data aggregation|*Rule:* Quality metrics from all WGs are aggregated (case execution/pass rates, defects, automation rate, coverage), based on each WG's test reports|☐| |
+| |Required|Residual risk assessment|*Rule:* Residual defect risk assessment is complete and recorded, including workarounds, risk acceptors, and the latest fix version|☐| |
+| |Required|TSC review|*Rule:* The Go/No-Go release decision review is completed|☐| |
+
+*Release decision:*
+* ☐ Go, official release
+* ☐ No-Go, re-evaluate after fixes (reason: ____; re-evaluation scope: ____)
+* ☐ Conditional release (remaining issue list: ____; risk acceptor: ____; latest fix version: ____)
+
+*Review record:* review date ____; attendees ____; sign-off ____; evidence links (test report/pipeline/Allure) ____
+
+----
+
+
+h2. 3. References
+
+* [OpenAN Integration Testing Process and Framework (Confluence)|https://lf-networking.atlassian.net/wiki/spaces/OpenAN/pages/1544945667/OpenAN+Integration+Testing+Process+and+Framework]
+
+h2. Revision History
+
+||Version||Date||Changes||
+|v0.1|—|Initial version|

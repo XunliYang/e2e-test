@@ -1,7 +1,7 @@
 # <特性名称> 测试方案
 
 > 版本：vX.Y | 日期：YYYY-MM-DD | 作者：<姓名> | 评审状态：待评审
-> 关联 OFEP：<链接> | 版本里程碑：vX.Y
+> 关联特性提案：<链接> | 版本里程碑：vX.Y
 > 归档路径：`docs/plans/<version>/`（评审通过后以 PR 合入）
 
 ---
@@ -32,7 +32,7 @@
 | 文档 | 链接/路径 |
 |------|----------|
 | OpenAN 集成测试流程及框架 | `docs/OpenAN Integration Testing Process and Framework.md` |
-| 特性提案（OFEP） | <链接> |
+| 特性提案 | <链接> |
 | 组件 API 文档 | Registry Center API Reference / Orchestration Center API Reference |
 | 部署契约 | `openan-installation/containerized/TRANSPORT_DEPLOYMENT.md` |
 | 兼容性矩阵 | <专项测试计划链接> |

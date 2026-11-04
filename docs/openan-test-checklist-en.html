@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OpenAN Test Checklist</title>
+<style>
+  body { font-family: -apple-system, "Segoe UI", Arial, sans-serif; max-width: 1100px; margin: 24px auto; color: #172B4D; line-height: 1.5; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+  th, td { border: 1px solid #DFE1E6; padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: #F4F5F7; }
+  code { background: #F4F5F7; padding: 1px 4px; border-radius: 3px; font-family: Consolas, monospace; }
+  blockquote { border-left: 3px solid #DFE1E6; margin: 12px 0; padding: 4px 16px; color: #505F79; }
+  hr { border: none; border-top: 1px solid #DFE1E6; margin: 24px 0; }
+</style>
+</head>
+<body>
+
+<h1>OpenAN Test Checklist</h1>
+
+<p><strong>Version:</strong> v0.1<br>
+<strong>Based on:</strong> <a href="https://lf-networking.atlassian.net/wiki/spaces/OpenAN/pages/1544945667/OpenAN+Integration+Testing+Process+and+Framework">OpenAN Integration Testing Process and Framework v0.1</a><br>
+<strong>Maintained by:</strong> OpenAN Integration Testing Working Group<br>
+<strong>Applicable to:</strong> feature handover acceptance (TRR), release testing<br>
+<strong>Terminology:</strong> FIT (Feature Integration Test), SIT (System Integration Test), TRR (Test Readiness Review), RC (Release Candidate), TSC (Technical Steering Committee), WG (Working Group), P0/P1/P2/P3 (case and defect priorities, defined in Framework §2 and §9.1)</p>
+
+<p><strong>Core principles: atomicity, repeatability, traceability, completeness, independence</strong></p>
+
+<blockquote><p><strong>Check items are normative clauses:</strong> this checklist only defines "what to check and by which rule". Specific entry gate values are defined in Framework §8; test targets, scenarios, and content are defined in test plans / specialized test plans.</p></blockquote>
+
+<hr>
+
+<h2>1. Feature Handover Acceptance Checklist (TRR)</h2>
+
+<blockquote><p>Executed after feature development is complete and before entering FIT.<br>
+<strong>Decision maker:</strong> Feature WG Maintainer<br>
+<strong>Executor:</strong> Feature WG test owner<br>
+<strong>Dispute arbitration:</strong> TRR disputes are arbitrated by the Integration Testing WG.</p></blockquote>
+
+<table>
+<thead>
+<tr><th>Category</th><th>Requirement</th><th>Check Item</th><th>Rule</th><th>Result</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td>Code &amp; Build</td><td>Required</td><td>Code merged</td><td><strong>Rule:</strong> All feature-related code has been merged into the main branch, with traceable version identifiers (tag/commit ID)</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Artifact build</td><td><strong>Rule:</strong> Test artifacts have been built and pushed to the image registry; the artifact list matches the version under test</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Module-level UT</td><td><strong>Rule:</strong> All module-level UTs pass, based on module repository pipeline/daily build results</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>UT coverage</td><td><strong>Rule:</strong> Meets the Framework §8.4 coverage gate, based on module repository pipeline requirements</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Deployable &amp; smoke</td><td><strong>Rule:</strong> Artifacts are deployable and all smoke cases pass, based on automated execution results</td><td>☐</td><td></td></tr>
+<tr><td>Requirements &amp; Test Design</td><td>Required</td><td>Requirement baseline</td><td><strong>Rule:</strong> The feature proposal/design has passed TSC review; the requirement baseline is frozen</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Test plan review</td><td><strong>Rule:</strong> The test plan is written per template and has passed review; PR merged into the <code>openan-itest</code> repo under <code>docs/plans/&lt;version&gt;/</code></td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Case conventions</td><td><strong>Rule:</strong> Case IDs, naming, and labels comply with Framework §6.1 and §6.4</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Case automation</td><td><strong>Rule:</strong> 100% of P0/P1 cases are automated and repeatable; non-automatable cases must state the reason and provide self-test results</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Case quality</td><td><strong>Rule:</strong> Cases meet Framework §6.3 writing requirements (explicit assertions, no log-only checks, complete cleanup, no sleep or order dependencies); determinism requirements for cases involving external dependencies follow the test plan</td><td>☐</td><td></td></tr>
+<tr><td>Environment &amp; Data</td><td>Required</td><td>Environment availability</td><td><strong>Rule:</strong> Test environment availability has been confirmed by the Integration Testing WG</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Data &amp; dependencies ready</td><td><strong>Rule:</strong> Test data, account permissions, and external dependencies declared in the test plan are ready; external dependencies may be replaced by stubs/mocks per the test plan</td><td>☐</td><td></td></tr>
+<tr><td>Test Execution</td><td>Required</td><td>Execution &amp; pass rate</td><td><strong>Rule:</strong> Meets the Framework §8.1 TRR entry gate (case execution rate and pass rates by priority), based on automated execution results</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Failed case handling</td><td><strong>Rule:</strong> All failed cases have archived issues labeled <code>skip-temporarily</code>, per Framework §6.4</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Performance baseline</td><td><strong>Rule:</strong> Key interface performance is not lower than the previous version baseline; baselines are defined in the specialized test plan</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Evidence retention</td><td><strong>Rule:</strong> Failure evidence (trace/logs/screenshots) is fully preserved, per Framework §6.3</td><td>☐</td><td></td></tr>
+<tr><td>Documentation &amp; Archiving</td><td>Required</td><td>Plan &amp; case archiving</td><td><strong>Rule:</strong> The test plan and case table are merged into the <code>openan-itest</code> repo under <code>docs/plans/&lt;version&gt;/</code>, per Framework §11.3</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Test code archiving</td><td><strong>Rule:</strong> Automated cases are merged into the <code>openan-itest</code> repo under <code>e2e/&lt;feature&gt;/</code>; new environment variables are synchronized to <code>.env.template</code> and README, per Framework §6.6</td><td>☐</td><td></td></tr>
+</tbody>
+</table>
+
+<p><strong>TRR decision:</strong></p>
+<ul>
+<li>☐ Pass, enter FIT</li>
+<li>☐ Conditional pass (remaining issue list: ____; issue links: ____; risk acceptor: ____; latest closure version: ____)</li>
+<li>☐ Fail, returned to development</li>
+</ul>
+
+<p><strong>Review record:</strong> review date ____; attendees ____; sign-off ____; evidence links (test report/pipeline/Allure) ____</p>
+
+<hr>
+
+<h2>2. Release Testing Checklist</h2>
+
+<blockquote><p>Used before RC release, during SIT execution, and at the release decision point, executed in gate order: RC entry → test execution → release decision.<br>
+<strong>Decision maker:</strong> TSC / Release Manager<br>
+<strong>Executor:</strong> Integration Testing WG<br>
+<strong>Dispute arbitration:</strong> release disputes are escalated to the TSC.</p></blockquote>
+
+<table>
+<thead>
+<tr><th>Category</th><th>Requirement</th><th>Check Item</th><th>Rule</th><th>Result</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td>Test Environment</td><td>Required</td><td>Environment baseline</td><td><strong>Rule:</strong> Test environment configuration is verified consistent with the production baseline; coverage scope follows the release test plan</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Environment verification</td><td><strong>Rule:</strong> The Integration Testing WG has completed environment availability verification</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Dependent services</td><td><strong>Rule:</strong> All dependent services defined in the release test plan are reachable</td><td>☐</td><td></td></tr>
+<tr><td>Version Build &amp; Deployment</td><td>Required</td><td>RC version</td><td><strong>Rule:</strong> RC version number, tag, and changelog are complete, complying with version management conventions</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Image build</td><td><strong>Rule:</strong> All component images have been built and pushed to the image registry</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Artifact integrity</td><td><strong>Rule:</strong> Release artifacts are complete (SBOM, image signatures, License inventory), based on pipeline gates and the release artifact list</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Deployment modes</td><td><strong>Rule:</strong> Installation verification passes for the supported deployment modes defined in the release test plan; out-of-scope modes are explicitly excluded</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Upgrade &amp; rollback</td><td><strong>Rule:</strong> Upgrade and rollback paths from the previous version pass verification; upgrade operations comply with the deployment contract</td><td>☐</td><td></td></tr>
+<tr><td>FIT Full Regression</td><td>Required</td><td>Full execution</td><td><strong>Rule:</strong> Meets the Framework §8.2 FIT exit gate (execution rate, pass rate, failed case handling), based on automated execution results</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>New feature coverage</td><td><strong>Rule:</strong> FIT for all new features in this version has been executed; exit criteria follow Framework §8.2</td><td>☐</td><td></td></tr>
+<tr><td>SIT</td><td>Required</td><td>Combined scenarios</td><td><strong>Rule:</strong> Meets the Framework §8.3 SIT exit gate (pass rate, no skips); scenario scope follows the release test plan</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Exception scenarios</td><td><strong>Rule:</strong> Exception and degradation scenarios pass per the test plan; state is consistent after fault recovery</td><td>☐</td><td></td></tr>
+<tr><td>Specialized Testing</td><td>Required</td><td>Test scope</td><td><strong>Rule:</strong> Specialized test types and scope are executed per Framework §10 and the specialized test plans; exit criteria follow the specialized test plans</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Performance baseline</td><td><strong>Rule:</strong> Key interface performance meets the baseline and is not lower than the previous version; baselines are defined in the specialized test plan</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Stability &amp; reliability</td><td><strong>Rule:</strong> Stability test duration and pass thresholds follow the specialized test plan; execution passes</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Security</td><td><strong>Rule:</strong> Security scanning and security feature verification pass; vulnerability exit meets the Framework §8.3 release requirements</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Compatibility</td><td><strong>Rule:</strong> The compatibility matrix passes per the specialized test plan definition</td><td>☐</td><td></td></tr>
+<tr><td>Defect Management</td><td>Required</td><td>Defect exit</td><td><strong>Rule:</strong> Meets Framework §9 defect management requirements: all P0 defects closed, P1 closed or with documented workarounds; handling timelines comply with §9.1</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Regression verification</td><td><strong>Rule:</strong> Every fix has a corresponding regression case that passes with the fix PR, per Framework §9.2 and §9.3</td><td>☐</td><td></td></tr>
+<tr><td>Coverage &amp; Traceability</td><td>Required</td><td>Requirement traceability</td><td><strong>Rule:</strong> 100% of approved requirements have corresponding executed cases</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Coverage</td><td><strong>Rule:</strong> Meets the Framework §8.4 coverage gate</td><td>☐</td><td></td></tr>
+<tr><td>Documentation &amp; Release Artifacts</td><td>Required</td><td>Test report</td><td><strong>Rule:</strong> The test report is written per template, reviewed and approved by the Integration Testing WG, and archived under <code>docs/reports/&lt;version&gt;/</code>, per Framework §11.3</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Release documents</td><td><strong>Rule:</strong> Release notes and installation documents match the current version; known issues and workarounds are complete</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Recommended</td><td>Experience environment</td><td><strong>Rule:</strong> Smoke tests pass on the external experience/demo environment (per the declared release scope)</td><td>☐</td><td></td></tr>
+<tr><td>Release Decision</td><td>Required</td><td>Quality data aggregation</td><td><strong>Rule:</strong> Quality metrics from all WGs are aggregated (case execution/pass rates, defects, automation rate, coverage), based on each WG's test reports</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>Residual risk assessment</td><td><strong>Rule:</strong> Residual defect risk assessment is complete and recorded, including workarounds, risk acceptors, and the latest fix version</td><td>☐</td><td></td></tr>
+<tr><td></td><td>Required</td><td>TSC review</td><td><strong>Rule:</strong> The Go/No-Go release decision review is completed</td><td>☐</td><td></td></tr>
+</tbody>
+</table>
+
+<p><strong>Release decision:</strong></p>
+<ul>
+<li>☐ Go, official release</li>
+<li>☐ No-Go, re-evaluate after fixes (reason: ____; re-evaluation scope: ____)</li>
+<li>☐ Conditional release (remaining issue list: ____; risk acceptor: ____; latest fix version: ____)</li>
+</ul>
+
+<p><strong>Review record:</strong> review date ____; attendees ____; sign-off ____; evidence links (test report/pipeline/Allure) ____</p>
+
+<hr>
+
+<h2>3. Notes on the Test Environment as an Acceptance Item</h2>
+
+<table>
+<thead>
+<tr><th>Stage</th><th>Environment accepted?</th><th>Rationale</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>TRR (feature handover)</strong></td><td>❌ No</td><td>The environment is provided and guaranteed by the Integration Testing WG; the feature WG only needs to confirm "environment available". The environment itself is not an acceptance criterion (see Chapter 1, "Environment &amp; Data" category)</td></tr>
+<tr><td><strong>Release testing</strong></td><td>✅ Yes</td><td>Before release, it must be confirmed that the test environment has passed all tests and its configuration matches production (see Chapter 2, "Test Environment" category)</td></tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>4. References</h2>
+
+<ul>
+<li><a href="https://lf-networking.atlassian.net/wiki/spaces/OpenAN/pages/1544945667/OpenAN+Integration+Testing+Process+and+Framework">OpenAN Integration Testing Process and Framework (Confluence)</a></li>
+</ul>
+
+<h2>Revision History</h2>
+
+<table>
+<thead>
+<tr><th>Version</th><th>Date</th><th>Changes</th></tr>
+</thead>
+<tbody>
+<tr><td>v0.1</td><td>—</td><td>Initial version</td></tr>
+</tbody>
+</table>
+
+</body>
+</html>
