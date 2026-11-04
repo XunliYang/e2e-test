@@ -68,7 +68,7 @@
 
 - [ ] 功能测试（API 集成、事件链）
 - [ ] 异常测试（网络故障、依赖故障、LLM 不可用降级）
-- [ ] A2A-T 协议测试（Task-T/Negotiation-T/Notification-T/Authorization-T，双传输一致性，Python/Java SDK 互操作）
+- [ ] A2A-T 协议测试（协议一致性、Prompt 契约、互操作性：跨语言 SDK 与 A2A 基础协议互通）
 - [ ] 性能测试（关键接口 P99：AgentCard 注册/检索、工作流执行、A2A-T 协商）
 - [ ] 压力/容量测试
 - [ ] 长稳测试（7×24h）

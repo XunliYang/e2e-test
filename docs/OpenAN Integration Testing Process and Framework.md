@@ -315,7 +315,7 @@ After passing the gate, CI can merge and publish the daily build.
 | **Reliability** | Fault injection, network partition, dependency failure, disk pressure | Auto-recovery, graceful degradation, state consistency |
 | **Security** | TLS/mTLS verification, JWS signature validation, permission isolation, API security scan | OWASP Top 10 compliance |
 | **Compatibility** | Kubernetes versions, OS compatibility, browser compatibility, database backends, dependency versions | Supported range per `openan-installation`: K8s v1.33+ / Helm 3.10+; DB backends: file/SQLite/PostgreSQL/MySQL/GaussDB; certified matrix (e.g., K8s v1.33-1.35, Ubuntu/CentOS/openEuler, Chrome/Firefox/Edge/Safari) is defined in the release test plan |
-| **A2A-T Protocol** | Negotiation state consistency, protocol version compatibility, large payload handling, concurrent negotiation conflict | Client/server state alignment, v1.0/v1.1 interoperability |
+| **A2A-T Protocol** | Protocol conformance (message schemas, state machines, dual-transport equivalence), prompt contract compliance (per the prompt templates spec), interoperability (cross-language SDKs, A2A base protocol interop), negotiation state consistency, protocol version compatibility, large payload handling, concurrent negotiation conflict | Client/server state alignment, v1.0/v1.1 interoperability |
 
 **Note**: Detailed performance benchmarks and thresholds are defined in separate test plans, not in this general framework.
 
