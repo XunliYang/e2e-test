@@ -72,11 +72,9 @@
 ### 4.1 Process Overview
 
 
-```
-┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
-│ 1. Req/Design         │ ─► │2. Test Design         │ ─►│ 3. TRR Gate           │ ─►│ 4. Execution          │ ─►│  5. Review             │ ─►│  6. Release           │
-│   (Requirement)       │    │(Plan & Cases)          │    │(P0/P1 Pass)           │    │ (FIT / SIT)           │    │(Async Review)          │    │(Release Gate)         │
-└──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘
+```mermaid
+flowchart LR
+    S1["1. Req/Design<br/>(Requirement)"] --> S2["2. Test Design<br/>(Plan & Cases)"] --> S3["3. TRR Gate<br/>(P0/P1 Pass)"] --> S4["4. Execution<br/>(FIT / SIT)"] --> S5["5. Review<br/>(Async Review)"] --> S6["6. Release<br/>(Release Gate)"]
 ```
 
 ### 4.2 Stage Descriptions
