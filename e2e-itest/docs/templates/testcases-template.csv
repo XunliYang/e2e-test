@@ -1,26 +1,26 @@
-里程碑,用例名称,用例编号,特性名称,用例类型,优先级,前置条件,步骤描述,预期结果,可自动化,对应自动化用例,开发负责人,测试负责人,备注
-v26.12,注册AgentCard并查询（含mTLS客户端身份）,【FIT-registry-center-agentcard-001】,registry-center,功能测试,P0,注册中心已按Helm部署且mTLS客户端证书已配置,"1、使用已配置客户端证书通过 POST /rest/v1/registry-center/agent-cards 提交签名后的AgentCard
+里程碑,用例名称,用例编号,特性名称,需求链接,用例类型,优先级,前置条件,步骤描述,预期结果,可自动化,对应自动化用例,开发负责人,测试负责人,备注
+v26.12,注册AgentCard并查询（含mTLS客户端身份）,【FIT-registry-center-agentcard-001】,registry-center,https://github.com/project-openan/registry-center/issues/1,功能测试,P0,注册中心已按Helm部署且mTLS客户端证书已配置,"1、使用已配置客户端证书通过 POST /rest/v1/registry-center/agent-cards 提交签名后的AgentCard
 2、通过 GET /rest/v1/registry-center/agent-cards/{org}/{name} 查询该Agent","1、注册成功，返回成功状态
 2、查询返回字段与提交内容一致",是,,<开发负责人>,<测试负责人>,需先生成AgentCard签名（JWS RS256）
-v26.12,AgentCard语义检索匹配,【FIT-registry-center-agentcard-002】,registry-center,功能测试,P1,注册中心已部署；LLM端点可用或已启用mock,"1、向注册中心发布至少两个不同能力的AgentCard
+v26.12,AgentCard语义检索匹配,【FIT-registry-center-agentcard-002】,registry-center,https://github.com/project-openan/registry-center/issues/2,功能测试,P1,注册中心已部署；LLM端点可用或已启用mock,"1、向注册中心发布至少两个不同能力的AgentCard
 2、提交与该能力匹配的自然语言任务描述调用语义检索接口","1、检索结果按相关度排序
 2、返回的AgentCard能力与任务描述匹配（LLM输出做确定性断言：状态码/结构/排序字段）",是,,<开发负责人>,<测试负责人>,USE_MOCK_LLM=true时断言结构不断言文本
-v26.12,意图生成工作流并执行端到端闭环,【FIT-orchestration-center-workflow-001】,orchestration-center,功能测试,P0,"编排中心与注册中心已部署；样例Agent已启动；登录态已获取","1、登录编排中心获取会话
+v26.12,意图生成工作流并执行端到端闭环,【FIT-orchestration-center-workflow-001】,orchestration-center,https://github.com/project-openan/orchestration-center/issues/5,功能测试,P0,"编排中心与注册中心已部署；样例Agent已启动；登录态已获取","1、登录编排中心获取会话
 2、提交自然语言意图调用生成接口得到PSOP
 3、执行该PSOP并订阅SSE事件流
 4、观察执行状态与事件序列","1、PSOP生成成功且结构合法（DAG无环、context_from血缘正确）
 2、执行完成状态为complete
 3、SSE事件包含各阶段与SDK任务事件",是,,<开发负责人>,<测试负责人>,依赖样例Agent（openan-demo mockagent）
-v26.12,LLM依赖不可用时的降级行为,【FIT-orchestration-center-workflow-002】,orchestration-center,异常测试,P1,编排中心已部署,"1、断开LLM端点网络或配置不可达地址
+v26.12,LLM依赖不可用时的降级行为,【FIT-orchestration-center-workflow-002】,orchestration-center,https://github.com/project-openan/orchestration-center/issues/6,异常测试,P1,编排中心已部署,"1、断开LLM端点网络或配置不可达地址
 2、提交意图生成请求
 3、观察响应与日志","1、接口返回明确错误（如503/业务错误码），不返回半成品PSOP
 2、日志记录LLM调用失败原因",是,,<开发负责人>,<测试负责人>,故障注入：LLM端点不可达
-v26.12,A2A-T四类消息双传输一致性,【SIT-a2at-protocol-001】,a2a-t-sdk,协议测试,P0,Python与Java样例Agent均已注册并可互相发现,"1、同一对Agent分别通过JSON-RPC与HTTP+REST传输发送Task-T任务
+v26.12,A2A-T四类消息双传输一致性,【SIT-a2at-protocol-001】,a2a-t-sdk,https://github.com/project-openan/a2a-t-sdk-python/issues/3,协议测试,P0,Python与Java样例Agent均已注册并可互相发现,"1、同一对Agent分别通过JSON-RPC与HTTP+REST传输发送Task-T任务
 2、触发Negotiation-T协商与Notification-T事件订阅
 3、校验Authorization-T授权拒绝未授权操作","1、两种传输下任务状态机一致
 2、协商过程状态对齐
 3、未授权操作被拒绝并记录",是,,<开发负责人>,<测试负责人>,跨语言SDK互操作（python sdk ↔ java sdk）
-v26.12,宽带投诉处理多智能体端到端场景,【SIT-complaint-handling-001】,system-integration,系统测试,P0,"全部核心组件已部署；客服/计费/CDN/厂商故障样例Agent就绪","1、模拟呼叫中心提交""无法上网""投诉意图
+v26.12,宽带投诉处理多智能体端到端场景,【SIT-complaint-handling-001】,system-integration,https://github.com/project-openan/orchestration-center/issues/8,系统测试,P0,"全部核心组件已部署；客服/计费/CDN/厂商故障样例Agent就绪","1、模拟呼叫中心提交""无法上网""投诉意图
 2、观察编排中心工作流召回、Agent检索、A2A-T协作执行过程
 3、检查SSE事件流与执行结果","1、工作流自动召回并正确编排相关Agent
 2、各Agent协作完成诊断

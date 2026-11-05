@@ -123,7 +123,7 @@
 
 ### 5.4 用例表
 
-用例以 14 列 CSV 承载，与本方案同目录归档：`docs/plans/<version>/testcases-<feature>.csv`。字段填写规范见 [用例表字段说明](用例表字段说明.md)，模板见 [testcases-template.csv](testcases-template.csv)。
+用例以 15 列 CSV 承载，与本方案同目录归档：`docs/plans/<version>/testcases-<feature>.csv`。P0/P1 用例必须填写需求链接（issue），支撑需求覆盖率追溯。字段填写规范见 [用例表字段说明](用例表字段说明.md)，模板见 [testcases-template.csv](testcases-template.csv)。
 
 ### 5.5 用例设计要求
 
