@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OpenAN Integration Testing Process and Framework</title>
+<style>
+  body { font-family: -apple-system, "Segoe UI", Arial, sans-serif; max-width: 1100px; margin: 24px auto; color: #172B4D; line-height: 1.6; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+  th, td { border: 1px solid #DFE1E6; padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: #F4F5F7; }
+  code { background: #F4F5F7; padding: 1px 4px; border-radius: 3px; font-family: Consolas, monospace; }
+  pre { background: #F4F5F7; padding: 12px; border-radius: 4px; font-family: Consolas, monospace; font-size: 13px; overflow-x: auto; }
+  hr { border: none; border-top: 1px solid #DFE1E6; margin: 32px 0; }
+  h1 { font-size: 24px; }
+  h2 { font-size: 20px; margin-top: 28px; }
+  h3 { font-size: 17px; margin-top: 20px; }
+  h4 { font-size: 15px; margin-top: 20px; color: #0052CC; border-bottom: 2px solid #DFE1E6; padding-bottom: 4px; }
+  .flow td { text-align: center; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<h1>OpenAN Integration Testing Process and Framework</h1>
+
+<p><strong>Version:</strong> v0.1 (Draft)<br>
+<strong>Maintained by:</strong> OpenAN Integration Testing Working Group</p>
+
+<hr>
+
+<h2>1. Purpose and Scope</h2>
+
+<h3>1.1 Purpose</h3>
+<ul>
+<li>Standardize the definition, process, and quality gates of integration testing within the OpenAN community, ensuring all working groups and community partners deliver integrable code under a unified set of rules.</li>
+<li>Reduce integration risks before release and avoid the situation where "every module passed unit tests, but they fail when integrated."</li>
+<li>Provide contributors with clear guidance on "how to write integration tests for OpenAN."</li>
+</ul>
+
+<h3>1.2 Scope</h3>
+<ul>
+<li>Applies to all OpenAN community code repositories and the corresponding integration test repository.</li>
+<li>Applies to all integration testing activities before a community release, including Feature Integration Testing (FIT), System Integration Testing (SIT), and specialized testing.</li>
+<li>Does not replace unit testing (UT) or static code analysis; unit testing is governed by each working group within their module repositories.</li>
+</ul>
+
+<h3>1.3 Audience</h3>
+<ul>
+<li>Contributors, working group test owners, reviewers, Integration Testing Working Group members, maintainers, release managers.</li>
+</ul>
+
+<h2>2. Terminology</h2>
+
+<table>
+<thead>
+<tr><th>Term</th><th>Definition</th></tr>
+</thead>
+<tbody>
+<tr><td>Feature</td><td>A functional unit in the OpenAN community, organized by working group, corresponding to one or more code repositories.</td></tr>
+<tr><td>Working Group (WG)</td><td>A collaborative unit in the OpenAN community organized by responsibility, such as the Integration Testing WG, Infra WG.</td></tr>
+<tr><td>Feature Integration Test (FIT)</td><td>Within a single feature, verifies that multiple modules/services can integrate correctly in a real environment and fulfill requirements.</td></tr>
+<tr><td>System Integration Test (SIT)</td><td>At the OpenAN distribution level, verifies stability, availability, and compatibility of multiple features under typical scenarios.</td></tr>
+<tr><td>Test Readiness Review (TRR)</td><td>The acceptance checkpoint after feature development is complete and before entering FIT; entry criteria is 100% pass rate of P0/P1 test cases.</td></tr>
+<tr><td>Quality Gate</td><td>A set of automated checks that must all pass, including test pass rate, coverage, license, sensitive information, etc.</td></tr>
+<tr><td>RC (Release Candidate)</td><td>A joint debugging candidate version released regularly by Release Management for community partners to try out and verify.</td></tr>
+<tr><td>Long-duration Stability Test</td><td>Running continuously for 7×24 hours to verify system stability under prolonged load.</td></tr>
+<tr><td>Integration Testing WG</td><td>The working group responsible for overall quality assurance and test system maintenance.</td></tr>
+<tr><td>Infra WG</td><td>The working group responsible for CI engineering and gate pipeline maintenance.</td></tr>
+</tbody>
+</table>
+
+<h2>3. Roles and Responsibilities</h2>
+
+<table>
+<thead>
+<tr><th>Role</th><th>Responsibilities</th></tr>
+</thead>
+<tbody>
+<tr><td>Contributor</td><td>Submits code and accompanying integration test cases; ensures cases are repeatable and automatically executable; responds to review feedback.</td></tr>
+<tr><td>Reviewer</td><td>Reviews test plans, test code, and test reports; checks compliance with this standard; confirms quality data.</td></tr>
+<tr><td>WG Test Owner</td><td>One per working group; oversees the test plan and progress of the WG, reports to the Integration Testing WG; not required to execute tests personally.</td></tr>
+<tr><td>Integration Testing WG</td><td>Maintains this standard, templates, and test cases; provides automation test case templates and generation/execution skills; organizes test plan and report reviews; executes SIT and specialized tests; aggregates quality data.</td></tr>
+<tr><td>Infra WG</td><td>Maintains CI pipelines, gate checks, and daily builds; ensures test environments are available and reusable.</td></tr>
+<tr><td>Maintainer</td><td>Holds ultimate responsibility for merged code and accompanying tests; checks gate results; approves feature TRR.</td></tr>
+<tr><td>TSC</td><td>Determines RC release cadence and release review; decides Go / No-Go.</td></tr>
+</tbody>
+</table>
+
+<h3>3.1 Test Owner Requirements</h3>
+<ul>
+<li>Must cover at least one full release cycle;</li>
+<li>Can come from the WG or the Integration Testing WG;</li>
+<li>Must have a global understanding of test work items within the WG.</li>
+</ul>
+
+<h2>4. Overall Integration Testing Process</h2>
+
+<h3>4.1 Process Overview</h3>
+
+<table class="flow">
+<tbody>
+<tr>
+<td><strong>1. Req/Design</strong><br>(Requirement)</td>
+<td>─►</td>
+<td><strong>2. Test Design</strong><br>(Plan &amp; Cases)</td>
+<td>─►</td>
+<td><strong>3. TRR Gate</strong><br>(P0/P1 Pass)</td>
+<td>─►</td>
+<td><strong>4. Execution</strong><br>(FIT / SIT)</td>
+<td>─►</td>
+<td><strong>5. Review</strong><br>(Async Review)</td>
+<td>─►</td>
+<td><strong>6. Release</strong><br>(Release Gate)</td>
+</tr>
+</tbody>
+</table>
+
+<h3>4.2 Stage Descriptions</h3>
+
+<h4>Stage 1: Requirements and Design</h4>
+<ul>
+<li>Test design may begin only after the feature proposal has passed TSC review.</li>
+<li>Output: Feature test plan (including FIT scope, SIT scope, required environments, data, and schedule).</li>
+</ul>
+
+<h4>Stage 2: Test Design</h4>
+<ul>
+<li>Write the test plan following the template, with test cases attached in CSV/table format;</li>
+<li>Cases must be tagged with priority (P0/P1/P2), environment, and dependencies;</li>
+<li>The test plan is submitted as a PR to the <code>openan-itest</code> repository under the corresponding version directory, reviewed by the Integration Testing WG via PR review, and merged upon approval.</li>
+</ul>
+
+<h4>Stage 3: Test Readiness Review (TRR)</h4>
+<ul>
+<li>Trigger conditions: feature code development complete, module-level UT/DT all passed, image built;</li>
+<li>Entry criteria: automated FIT with <strong>100% pass rate for P0/P1 cases</strong>; P2 case pass rate ≥ 80%;</li>
+<li>Decision maker: Feature WG Maintainer;</li>
+<li>Upon approval, the feature formally enters the "Feature Integration Testing" stage.</li>
+</ul>
+
+<h4>Stage 4: Test Execution</h4>
+<ul>
+<li>Feature Integration Testing (FIT): run all FIT cases for the feature in a real environment;</li>
+<li>System Integration Testing (SIT): SIT executed by the Integration Testing WG on RC versions, covering multi-feature combination scenarios;</li>
+<li>Execution results must be automatically collected: case pass rate, failed case list, trace/log/screenshots, performance metrics.</li>
+</ul>
+
+<h4>Stage 5: Report Review</h4>
+<ul>
+<li>The Feature WG Test Maintainer writes the feature test report (per template);</li>
+<li>The Integration Testing WG organizes a review meeting (online/offline), focusing on: whether case coverage targets are met, whether remaining issues have workarounds, and whether performance meets baselines.</li>
+</ul>
+
+<h4>Stage 6: Archive and Release</h4>
+<ul>
+<li>Test plans, test reports, and test code are all archived in the <code>openan-itest</code> repository;</li>
+<li>The Release Manager decides whether the version proceeds to official release based on SIT results and the remaining issue list.</li>
+</ul>
+
+<h3>4.3 Test Timeline (per Release Cycle)</h3>
+
+<p><em>Concrete dates follow each release plan (see the <a href="https://lf-networking.atlassian.net/wiki/spaces/OpenAN/pages/1187905545/OpenAN+26.12">OpenAN 26.12 Release Plan</a>); deliverable templates are maintained in the <code>openan-itest</code> repository under <code>docs/templates/</code>.</em></p>
+
+<h4>4.3.1 Handover (TRR)</h4>
+<p><strong>Entry conditions</strong>: Feature development complete — code merged into mainline, images built, module-level UT gates met (coverage not decreased), smoke tests passed.</p>
+<p><strong>Workflow:</strong></p>
+<ol>
+<li>The feature WG submits a handover issue in the <code>openan-itest</code> repository (linked to requirements and feature scope);</li>
+<li>Submits the test plan (per the <a href="https://github.com/project-openan/openan-itest/blob/main/docs/templates/test-plan-template.md">test plan template</a>) and the case table (per the <a href="https://github.com/project-openan/openan-itest/blob/main/docs/templates/testcases-template.csv">test case table template</a>) via PR, and merges the FIT automated test cases;</li>
+<li>The Integration Testing WG organizes the handover review (plan, cases, automation code);</li>
+<li>Upon approval the handover is complete and the execution phase starts.</li>
+</ol>
+<p><strong>Feature WG</strong>: delivers the test plan, test case table and FIT automated test cases (merged into <code>e2e/&lt;feature&gt;/</code>).</p>
+<p><strong>Integration Testing WG</strong>: organizes the review; delivers review comments and the TRR conclusion.</p>
+<p><strong>Acceptance</strong>: test plan approved; cases conform to the standards (P0/P1 100% automated, requirement links filled); automated cases independently repeatable.</p>
+
+<h4>4.3.2 FIT Full Self-Test &amp; Requirement Acceptance</h4>
+<p><strong>Entry conditions</strong>: TRR review passed.</p>
+<p><strong>Workflow:</strong></p>
+<ol>
+<li>The feature WG test owner executes the full FIT self-test and produces the self-test report;</li>
+<li>The Integration Testing WG executes the SIT smoke cases;</li>
+<li>Coverage and pass-rate requirements are verified against the test report;</li>
+<li>Requirement acceptance completes once the requirements are met.</li>
+</ol>
+<p><strong>Feature WG</strong>: delivers the FIT self-test report (per the <a href="https://github.com/project-openan/openan-itest/blob/main/docs/templates/test-report-template.md">test report template</a>).</p>
+<p><strong>Integration Testing WG</strong>: executes the SIT smoke; delivers smoke results and the requirement acceptance conclusion.</p>
+<p><strong>Acceptance</strong>: pass rates meet Framework §8.2 (P0/P1 = 100%, overall ≥ 95%); coverage meets Framework §8.4 (requirement coverage 100%, API coverage ≥ 80%); failed cases archived with issues.</p>
+
+<h4>4.3.3 RC-0</h4>
+<p><strong>Entry conditions</strong>: feature freeze; RC-0 version image package built.</p>
+<p><strong>Workflow:</strong></p>
+<ol>
+<li>The Integration Testing WG deploys the RC-0 image package and verifies deployment;</li>
+<li>Runs the full FIT/SIT regression;</li>
+<li>Starts specialized testing (performance, 7×24h stability, security, compatibility, A2A-T protocol, etc.);</li>
+<li>Publishes the RC-0 test report.</li>
+</ol>
+<p><strong>Feature WG</strong>: fixes P0/P1 defects or provides workarounds; delivers defect closure records.</p>
+<p><strong>Integration Testing WG</strong>: runs the regression and specialized testing; delivers the RC-0 test report (per the <a href="https://github.com/project-openan/openan-itest/blob/main/docs/templates/test-report-template.md">test report template</a>).</p>
+<p><strong>Acceptance</strong>: RC-0 test report published; defect handling within Framework §9.1 timelines; residual risks each with a named risk acceptor.</p>
+
+<h4>4.3.4 RC-1</h4>
+<p><strong>Entry conditions</strong>: RC-0 issues fixed; RC-1 version image package built.</p>
+<p><strong>Workflow:</strong></p>
+<ol>
+<li>The Integration Testing WG deploys the RC-1 image package;</li>
+<li>Runs the full FIT/SIT regression and wraps up specialized testing (stability conclusions, etc.);</li>
+<li>Publishes the RC-1 test report and aggregates quality data as release-decision input;</li>
+<li>TSC release review (Go/No-Go).</li>
+</ol>
+<p><strong>Feature WG</strong>: closes residual defects and accepts risks; delivers the residual issue list.</p>
+<p><strong>Integration Testing WG</strong>: delivers the RC-1 test report and quality data summary with the release recommendation.</p>
+<p><strong>Acceptance</strong>: Framework §8.3 release entry met (SIT pass rate 100% without skips, stability run without P0/P1 failures, install/upgrade/rollback passed, all P0 defects closed); quality data summary complete.</p>
+
+<h2>5. Test Layers and Scope</h2>
+
+<h3>5.1 Layered Model</h3>
+
+<table>
+<thead>
+<tr><th>Layer</th><th>Executor</th><th>Environment</th><th>Focus</th><th>Case Form</th></tr>
+</thead>
+<tbody>
+<tr><td>Unit Test (UT)</td><td>Developer</td><td>IDE / Mock</td><td>Correctness of individual functions/classes</td><td><code>&lt;pkg&gt;_test.go</code> / <code>test_*.py</code> in module repo</td></tr>
+<tr><td>Developer Test (DT)</td><td>Developer</td><td>Local cluster</td><td>Module external interface contracts</td><td>Smoke e2e cases in module repo</td></tr>
+<tr><td><strong>Feature Integration Test (FIT)</strong></td><td>Feature WG</td><td><strong>Real environment</strong></td><td>Integration correctness of multiple modules/services within the feature</td><td>Feature directory in <code>openan-itest</code> repo</td></tr>
+<tr><td><strong>System Integration Test (SIT)</strong></td><td>Integration Testing WG</td><td><strong>Real environment + typical scenarios</strong></td><td>Overall stability, availability, compatibility of the distribution</td><td><code>system-integration/</code> in <code>openan-itest</code> repo</td></tr>
+<tr><td>Specialized Testing</td><td>Integration Testing WG</td><td>Varies by specialty</td><td>Performance, security, compatibility, long-duration stability, documentation, conformance</td><td>Specialty directories</td></tr>
+</tbody>
+</table>
+
+<h3>5.2 Boundaries of Integration Testing</h3>
+
+<p><strong>Included in Integration Testing (FIT/SIT/Specialized Testing)</strong></p>
+<ul>
+<li>Cross-module API calls, cross-service data flows, event trigger chains;</li>
+<li>Installation/upgrade/rollback paths;</li>
+<li>Multi-feature combination usage (e.g., registry + orchestrate + execute);</li>
+<li>Validating end-user critical paths on a real Kubernetes cluster or virtual machine;</li>
+<li>Specialized testing: performance, stress, stability, reliability, security, compatibility, A2A-T protocol, etc. (executed by the Integration Testing WG; categories defined in Section 10).</li>
+</ul>
+
+<p><strong>Not Included in Integration Testing (do not do these at the integration layer)</strong></p>
+<ul>
+<li>Boundary conditions of individual functions (should be covered in UT);</li>
+<li>Pure UI layout and styling (belongs to frontend manual/UI automation, not covered by this standard).</li>
+</ul>
+
+<h2>6. Test Case Standards</h2>
+
+<h3>6.1 Case ID and Naming</h3>
+<ul>
+<li>Case ID format: <code>FIT-&lt;feature&gt;-&lt;topic&gt;-&lt;number&gt;</code> (e.g., <code>FIT-orchestration-workflow-001</code>); SIT cases use <code>SIT-&lt;scenario&gt;-&lt;number&gt;</code>;</li>
+<li>Test descriptions in English, format: <code>&lt;case-id&gt; - Case Description</code>;</li>
+<li><strong>Test file naming</strong>: <code>test_&lt;topic&gt;.py</code>, where topic is a functional scenario under the feature, using lowercase words separated by underscores (e.g., <code>test_workflow.py</code>, <code>test_agent.py</code>);</li>
+<li><strong>Test function naming</strong>: <code>test_&lt;action&gt;_&lt;expected_result&gt;</code>, clearly expressing the action and expected result (e.g., <code>test_create_workflow_success</code>, <code>test_delete_agent_not_found</code>);</li>
+<li><strong>Optional class grouping</strong>: When a topic has many cases, use <code>Test&lt;Topic&gt;API</code> class grouping (e.g., <code>TestWorkflowAPI</code>); methods within the class still start with <code>test_</code>;</li>
+<li><strong>Playwright test files</strong>: <code>test-&lt;scenario&gt;.spec.ts</code>.</li>
+</ul>
+
+<h3>6.2 Directory Structure</h3>
+
+<pre>openan-itest/
+├── e2e/                              # Backend integration tests (pytest)
+│   ├── framework/                    # Shared: K8s client, env loading, utilities
+│   ├── &lt;feature&gt;/                    # Directory per feature
+│   │   ├── test_&lt;feature&gt;_api.py
+│   │   ├── test_&lt;topic&gt;.py
+│   │   ├── system-integration/       # System-level integration cases for this feature
+│   │   │   └── test_&lt;scenario&gt;.py
+│   │   └── utils/  static/
+│   └── .env.template
+├── e2e-frontend/                     # Frontend UI automation (optional)
+├── testcases/functional/integration/ # pytest (legacy stack, keep as needed)
+├── docs/                             # Test plans and reports archive
+│   ├── plans/                        # Test plans by version
+│   └── reports/                      # Test reports by version
+└── README.md</pre>
+
+<h3>6.3 Case Writing Requirements</h3>
+<ul>
+<li>Every case must include: preconditions, steps, assertions, and cleanup actions;</li>
+<li>Assertions must be explicit; logging without assertion is prohibited;</li>
+<li>Cases must be independently repeatable; relying on execution order from other cases is prohibited (if ordering is required, explicitly declare with <code>Ordered</code> / <code>test.describe.serial</code>);</li>
+<li>Multiple closely related cases may be merged into one test function to reduce duplicate context creation;</li>
+<li>Using <code>sleep</code> for synchronization is prohibited; use framework-provided wait/retry mechanisms (Playwright auto-wait, <code>eventually</code>, etc.);</li>
+<li>On failure, preserve the scene: trace, screenshots, relevant Pod logs, K8s events.</li>
+</ul>
+
+<h3>6.4 Labels / Tags</h3>
+
+<p>Every case must carry at least the following label dimensions:</p>
+
+<table>
+<thead>
+<tr><th>Dimension</th><th>Examples</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td>feature</td><td><code>registry-center</code>, <code>orchestration-center</code></td><td>Module identifier</td></tr>
+<tr><td>environment</td><td><code>with-workload-cluster</code>, <code>online</code>, <code>offline</code></td><td>CI environment filtering</td></tr>
+<tr><td>components</td><td><code>registry-center</code>, <code>openan-portal</code></td><td>Required components</td></tr>
+<tr><td>priority</td><td><code>P0</code>, <code>P1</code>, <code>P2</code></td><td>Case priority</td></tr>
+<tr><td>skip</td><td><code>skip-temporarily</code></td><td>Temporary skip; must reference an issue link</td></tr>
+<tr><td><strong>execution</strong></td><td><code>smoke</code>, <code>full</code>, <code>slow</code></td><td>PR CI runs <code>smoke</code>, Daily runs <code>full</code></td></tr>
+</tbody>
+</table>
+
+<h3>6.5 Data Preparation and Cleanup</h3>
+<ul>
+<li>Test data is provided via fixtures; choose function/class/module/session scope as needed;</li>
+<li>Every case must clean up in teardown: delete created namespaces, CRs, Pods, PVs, configurations;</li>
+<li>Sharing mutable state across cases is strictly prohibited; session-level fixtures are only for read-only configuration (e.g., llm config, login state).</li>
+</ul>
+
+<h3>6.6 Configuration and Secrets</h3>
+<ul>
+<li>All external dependencies (cluster addresses, credentials, SSH, image registries) are injected via environment variables;</li>
+<li>Only <code>.env.template</code> is kept in the repository; <strong>committing <code>.env</code> or any real credentials is strictly prohibited</strong>;</li>
+<li>During code review, check for hardcoded IPs / passwords / tokens; reject merge if found.</li>
+</ul>
+
+<h2>7. Automation Framework and Toolchain Recommendations</h2>
+
+<h3>7.1 Recommended Stack</h3>
+
+<table>
+<thead>
+<tr><th>Purpose</th><th>Primary</th><th>Alternative</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td>Backend integration testing</td><td>pytest (Python)</td><td>-</td><td>Same language as OpenAN main code; reuse clients and types</td></tr>
+<tr><td>Frontend UI testing</td><td>Playwright (TypeScript)</td><td>pytest + Playwright (Python)</td><td>Playwright auto-wait + Trace capabilities are mature</td></tr>
+<tr><td>K8s resource management</td><td>client-go / kubernetes-client python</td><td>-</td><td>Already encapsulated in framework</td></tr>
+<tr><td>Cluster lifecycle</td><td>kind / k3s (local), community lab (real cluster)</td><td>-</td><td>FIT runs on real clusters</td></tr>
+<tr><td>Reporting</td><td>JUnit XML + Allure</td><td>-</td><td>CI aggregation and display</td></tr>
+</tbody>
+</table>
+
+<h3>7.2 CI Trigger Strategy</h3>
+<ul>
+<li><strong>PR trigger</strong>: run only FIT cases under affected feature directories, with label <code>--label-filter="!&lt;skip-temporarily&gt;"</code>;</li>
+<li><strong>Daily build trigger</strong>: full FIT + smoke SIT;</li>
+<li><strong>RC version trigger</strong>: full FIT + full SIT + start long-duration stability test;</li>
+<li><strong>Pre-release trigger</strong>: rerun all P0/P1 + all SIT on RC as input to release review.</li>
+</ul>
+
+<h3>7.3 Gate Pipeline</h3>
+
+<p>The PR gate pipeline maintained by the Infra WG must include at least:</p>
+<ol>
+<li>License / DCO check;</li>
+<li>Code style and static analysis;</li>
+<li>Interface change check (compatibility);</li>
+<li>Sensitive information scan (secrets, internal IPs);</li>
+<li>Smoke FIT cases under the affected feature directory.</li>
+</ol>
+<p>After passing the gate, CI can merge and publish the daily build.</p>
+
+<h2>8. Entry and Exit Criteria (Quality Gates)</h2>
+
+<h3>8.1 TRR (FIT Entry)</h3>
+<ul>
+<li>P0 case pass rate = 100%;</li>
+<li>P1 case pass rate = 100%;</li>
+<li>P2 case pass rate ≥ 80%;</li>
+<li>Module-level UT coverage does not decrease (compared to previous version);</li>
+<li>Image is buildable and deployable.</li>
+</ul>
+
+<h3>8.2 FIT Exit</h3>
+<ul>
+<li>Overall FIT case pass rate ≥ 95%;</li>
+<li>Failed cases have archived issues and are labeled <code>skip-temporarily</code>;</li>
+<li>Performance is not lower than the previous version baseline (key interface P99 latency, resource usage);</li>
+<li>Test report is reviewed and approved by the Integration Testing WG.</li>
+</ul>
+
+<h3>8.3 SIT Exit / Release Entry</h3>
+<ul>
+<li>Overall SIT case pass rate = 100% (no skips allowed);</li>
+<li>7×24h continuous stability run on RC with no P0/P1 failures;</li>
+<li>Installation, upgrade, and rollback paths all pass;</li>
+<li>No open P0 defects; P1 defects have clear workarounds and fix plans;</li>
+<li>Compatibility matrix (OS × hardware × dependency versions) passes.</li>
+</ul>
+
+<h3>8.4 Coverage Requirements</h3>
+<ul>
+<li>Module repository UT line coverage ≥ 70% (core modules ≥ 80%);</li>
+<li>Integration test API coverage ≥ 80% (counted by OpenAPI paths).</li>
+</ul>
+
+<h2>9. Defect Management and Regression</h2>
+
+<h3>9.1 Defect Severity</h3>
+
+<table>
+<thead>
+<tr><th>Severity</th><th>Definition</th><th>Fix Timeline</th></tr>
+</thead>
+<tbody>
+<tr><td>P0</td><td>Blocker: installation failure, data loss, core functionality unavailable</td><td>Must respond within 24h; must fix in current release</td></tr>
+<tr><td>P1</td><td>Critical: major functionality impaired, but temporary workaround exists</td><td>Fix within 3 business days</td></tr>
+<tr><td>P2</td><td>Major: minor functionality issues</td><td>Fix in next release</td></tr>
+<tr><td>P3</td><td>Minor: UI, copy, experience</td><td>Schedule as needed</td></tr>
+</tbody>
+</table>
+
+<h3>9.2 Defect Process</h3>
+<ol>
+<li>Failed cases automatically open an issue with trace/log/screenshots/cluster info attached;</li>
+<li>Defect ownership is confirmed by the WG test owner + Maintainer;</li>
+<li>After fix, regression cases must be added and FIT rerun;</li>
+<li>Before RC release, all P0/P1 defects must be closed or have clear workarounds.</li>
+</ol>
+
+<h3>9.3 Regression Strategy</h3>
+<ul>
+<li>Every fix PR must rerun all FIT cases for that feature;</li>
+<li>Every RC version must rerun all P0/P1 cases;</li>
+<li>Full regression must be performed once before official release.</li>
+</ul>
+
+<h2>10. Non-Functional Testing</h2>
+
+<table>
+<thead>
+<tr><th>Category</th><th>Examples of Test Items</th><th>Key Metrics / Scenarios</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Performance</strong></td><td>API response time, workflow execution latency, negotiation throughput, agent registration/discovery</td><td>P95/P99 latency, TPS/QPS, resource utilization</td></tr>
+<tr><td><strong>Stress</strong></td><td>Concurrent workflows, massive agent scale, high-concurrency negotiation, message backlog recovery</td><td>Breaking point, degradation pattern, recovery time</td></tr>
+<tr><td><strong>Stability</strong></td><td>Basic stability (7×24h), load stability (7×24h), extended stability (30 days)</td><td>Memory leak, performance degradation, restart frequency</td></tr>
+<tr><td><strong>Reliability</strong></td><td>Fault injection, network partition, dependency failure, disk pressure</td><td>Auto-recovery, graceful degradation, state consistency</td></tr>
+<tr><td><strong>Security</strong></td><td>TLS/mTLS verification, JWS signature validation, permission isolation, API security scan</td><td>OWASP Top 10 compliance</td></tr>
+<tr><td><strong>Compatibility</strong></td><td>Kubernetes versions, OS compatibility, browser compatibility, database backends, dependency versions</td><td>Supported range per <code>openan-installation</code>: K8s v1.33+ / Helm 3.10+; DB backends: file/SQLite/PostgreSQL/MySQL/GaussDB; certified matrix (e.g., K8s v1.33-1.35, Ubuntu/CentOS/openEuler, Chrome/Firefox/Edge/Safari) is defined in the release test plan</td></tr>
+<tr><td><strong>A2A-T Protocol</strong></td><td>Protocol conformance (message schemas, state machines, dual-transport equivalence), prompt contract compliance (per the prompt templates spec), interoperability (cross-language SDKs, A2A base protocol interop), negotiation state consistency, protocol version compatibility, large payload handling, concurrent negotiation conflict</td><td>Client/server state alignment, v1.0/v1.1 interoperability</td></tr>
+</tbody>
+</table>
+
+<p><strong>Note</strong>: Detailed performance benchmarks and thresholds are defined in separate test plans, not in this general framework.</p>
+
+<h2>11. Contribution Guidelines</h2>
+
+<h3>11.1 Submitting Integration Test Cases</h3>
+<ol>
+<li><strong>Sign the CLA</strong> (required before first contribution);</li>
+<li><strong>Fork &amp; Branch</strong>: from <code>openan-itest</code> <code>main</code>, create <code>&lt;feature&gt;/&lt;your-name&gt;-&lt;short-desc&gt;</code>;</li>
+<li><strong>Local Development</strong>: follow Sections 6 and 7 of this standard; verify locally on a real or temporary cluster;</li>
+<li><strong>Self-test</strong>: <code>pytest tests/api/python/&lt;feature&gt; -m "not slow"</code> passes;</li>
+<li><strong>Submit PR</strong>: PR description includes: feature name, case count, local run results, whether new environment variables are needed;</li>
+<li><strong>CI Check</strong>: pass gates (License, static analysis, smoke FIT);</li>
+<li><strong>Code Review</strong>: dual review by WG Reviewer + Integration Testing WG;</li>
+<li><strong>Merge</strong>: Maintainer approves and merges; cases enter daily build.</li>
+</ol>
+
+<h3>11.2 Review Standards</h3>
+<ul>
+<li>Cases comply with this standard (naming, tags, assertions, cleanup);</li>
+<li>Include necessary negative/exception cases;</li>
+<li>No hardcoding, sleep, or implicit order dependencies;</li>
+<li>Failure scene information is sufficient (trace/log/screenshots);</li>
+<li>Environment variables are added to <code>.env.template</code> and documented in README.</li>
+</ul>
+
+<h3>11.3 Test Plans and Reports</h3>
+<ul>
+<li>Test Plan: use template, attach case CSV, PR to <code>openan-itest</code> repo <code>docs/plans/&lt;version&gt;/</code> directory;</li>
+<li>Test Report: use template, include execution data, remaining issues, performance data, PR to <code>openan-itest</code> repo <code>docs/reports/&lt;version&gt;/</code> directory;</li>
+<li>Both are reviewed by the Integration Testing WG and then archived.</li>
+</ul>
+
+<h2>12. Test Strategy by Repository</h2>
+
+<table>
+<thead>
+<tr><th>Repository</th><th>Language</th><th>Type</th><th>Test Strategy</th><th>Framework</th><th>Archive Location</th></tr>
+</thead>
+<tbody>
+<tr><td><code>a2a-t-sdk-python</code></td><td>Python</td><td>SDK</td><td>UT</td><td>pytest</td><td>In-repo</td></tr>
+<tr><td><code>a2a-t-sdk-java</code></td><td>Java</td><td>SDK</td><td>UT</td><td>JUnit 5</td><td>In-repo</td></tr>
+<tr><td><code>workflow-engine-sdk-java</code></td><td>Java</td><td>SDK</td><td>UT</td><td>JUnit 5</td><td>In-repo</td></tr>
+<tr><td><code>workflow-engine-sdk-python</code></td><td>Python</td><td>SDK</td><td>UT</td><td>pytest</td><td>In-repo</td></tr>
+<tr><td><code>a2a-t-prompt-templates-spec</code></td><td>-</td><td>Spec</td><td>Template spec conformance review</td><td>Manual review</td><td>In-repo</td></tr>
+<tr><td><code>orchestration-center</code></td><td>Python + Node.js</td><td>Core Service</td><td>UT + FIT</td><td>pytest + requests/httpx</td><td><code>openan-itest</code></td></tr>
+<tr><td><code>registry-center</code></td><td>Python</td><td>Core Service</td><td>UT + FIT</td><td>pytest + requests/httpx</td><td><code>openan-itest</code></td></tr>
+<tr><td><code>openan-portal</code></td><td>JavaScript</td><td>Portal</td><td>UT + UI Testing</td><td>Jest / Vitest + Playwright</td><td><code>openan-itest/e2e-frontend/</code></td></tr>
+<tr><td><code>openan-installation</code></td><td>Shell + Helm</td><td>Deployment</td><td>Deployment Testing</td><td>pytest + kubernetes-client</td><td><code>openan-itest/e2e/installation/</code></td></tr>
+<tr><td><code>openan-demo</code></td><td>JavaScript</td><td>Demo</td><td>No independent testing</td><td>-</td><td>-</td></tr>
+<tr><td><code>project-openan.github.io</code></td><td>HTML</td><td>Website</td><td>No independent testing</td><td>-</td><td>-</td></tr>
+</tbody>
+</table>
+
+<p><strong>Notes:</strong></p>
+<ul>
+<li><strong>SIT</strong>: Executed by the Integration Testing WG on RC versions, covering multi-service combination scenarios</li>
+</ul>
+
+<hr>
+
+<p><em>This standard draft is maintained by the OpenAN Integration Testing Working Group. Community members are welcome to submit improvements via PR.</em></p>
+
+</body>
+</html>
