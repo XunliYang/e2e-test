@@ -38,17 +38,16 @@
 <h2>测试时间线（版本周期）：</h2>
 <p><em>各阶段前置条件、操作流程、工作组任务分工、交付物与验收内容的详细流程见《<a href="https://lf-networking.atlassian.net/wiki/spaces/OpenAN/pages/1544945667/OpenAN+Integration+Testing+Process+and+Framework">集成测试流程及框架</a>》§4.3。</em></p>
 
-<p><strong>OpenAN 26.12 测试时间线</strong>（依据 <a href="https://lf-networking.atlassian.net/wiki/spaces/OpenAN/pages/1187905545/OpenAN+26.12">OpenAN 26.12 发布计划</a>，2026-12-23 发布；以下为按发布日倒推的建议排期，以版本测试计划为准）：</p>
+<p><strong>OpenAN 26.12 测试时间线</strong>（转测 10-16~11-15；RC-0 10-30~11-25；RC-1 11-25~12-16；发布 2026-12-23；以版本计划为准）：</p>
 <table>
 <thead>
-<tr><th>时间</th><th>阶段</th><th>关键活动</th></tr>
+<tr><th>时间</th><th>版本阶段与测试</th><th>具体执行内容</th></tr>
 </thead>
 <tbody>
-<tr><td>2026-10-26 ~ 11-15</td><td><strong>转测（TRR）</strong></td><td>特性滚动转测与评审</td></tr>
-<tr><td>2026-11-02 ~ 11-22</td><td><strong>需求测试验收</strong></td><td>FIT 全量自测、SIT 冒烟与需求验收（与转测重叠并行）</td></tr>
-<tr><td>2026-11-23 ~ 12-08</td><td><strong>RC-0</strong></td><td>全量 FIT/SIT 回归、专项测试启动（性能、7×24h 长稳、安全、兼容性、A2A-T 协议）</td></tr>
-<tr><td>2026-12-09 ~ 12-22</td><td><strong>RC-1</strong></td><td>全量回归、专项测试收尾、质量数据汇总</td></tr>
-<tr><td>2026-12-23</td><td><strong>版本发布</strong></td><td>TSC Go/No-Go 发布评审</td></tr>
+<tr><td>2026-10-16 ~ 11-15</td><td><strong>M4 特性冻结 · 转测</strong></td><td>用例/测试方案设计与评审（与 RC-0 并行）</td></tr>
+<tr><td>2026-10-30 ~ 11-25</td><td><strong>RC-0 · 全量测试</strong></td><td>全量 FIT/SIT 回归与专项测试启动，特性工作组提供自测报告，完成需求验收</td></tr>
+<tr><td>2026-11-25 ~ 12-16</td><td><strong>RC-1 · 发布前测试</strong></td><td>RC-0 缺陷修复验证、发布前全量回归</td></tr>
+<tr><td>2026-12-23</td><td><strong>版本发布</strong></td><td>OpenAN 26.12 正式发布（TSC Go/No-Go）</td></tr>
 </tbody>
 </table>
 <table>
@@ -56,22 +55,26 @@
 <tr><th>阶段</th><th>时间点</th><th>特性工作组交付物</th><th>集成测试工作组交付物</th></tr>
 </thead>
 <tbody>
-<tr><td><strong>转测（TRR）</strong></td><td>特性开发完成后</td><td>测试方案、测试用例表、FIT 自动化测试用例</td><td>转测评审意见与 TRR 结论</td></tr>
-<tr><td><strong>FIT 全量自测与需求验收</strong></td><td>转测评审通过后</td><td>FIT 自测报告</td><td>SIT 冒烟结果与需求验收结论</td></tr>
-<tr><td><strong>RC-0</strong></td><td>特性冻结、镜像包构建完成后</td><td>P0/P1 缺陷闭环记录</td><td>RC-0 测试报告（全量 FIT/SIT 回归 + 专项测试启动）</td></tr>
-<tr><td><strong>RC-1</strong></td><td>RC-0 修复完成后</td><td>遗留问题清单与风险接受</td><td>RC-1 测试报告与质量数据汇总（Go/No-Go 输入）</td></tr>
+<tr><td><strong>转测（M4：测试设计与评审）</strong></td><td>M4 特性冻结起至 11-15</td><td>测试方案、测试用例表、FIT 自动化测试用例</td><td>转测评审意见与 TRR 结论</td></tr>
+<tr><td><strong>RC-0（全量测试与需求验收）</strong></td><td>RC-0 版本窗口</td><td>FIT 自测报告、P0/P1 缺陷闭环记录</td><td>RC-0 测试报告（全量 FIT/SIT + 专项测试）、需求验收结论</td></tr>
+<tr><td><strong>RC-1（发布前测试）</strong></td><td>RC-0 后至发布前</td><td>遗留问题清单与风险接受</td><td>RC-1 测试报告与质量数据汇总（Go/No-Go 输入）</td></tr>
 </tbody>
 </table>
 
 <h2>当前工作组成员：</h2>
 <table>
 <thead>
-<tr><th>角色</th><th>姓名</th><th>LF ID</th></tr>
+<tr><th>角色</th><th>姓名</th><th>LF ID</th><th>职责</th></tr>
 </thead>
 <tbody>
-<tr><td>Lead</td><td>Xunli Yang</td><td>@Xunli Yang</td></tr>
-<tr><td>成员</td><td>Junjie Huang</td><td>@Junjie Huang</td></tr>
-<tr><td>成员</td><td></td><td></td></tr>
+<tr><td>Lead</td><td>Xunli Yang</td><td>@Xunli Yang</td><td>负责工作组统筹，测试流程、测试计划与版本测试质量管理</td></tr>
+<tr><td>成员</td><td>Junjie Huang</td><td>@Junjie Huang</td><td>负责系统及回归测试</td></tr>
+<tr><td>成员</td><td>Haowan Weng</td><td>@Haowan Weng</td><td>负责系统及回归测试</td></tr>
+<tr><td>成员</td><td>Bo Gao</td><td>@Bo Gao</td><td>负责安全专项测试</td></tr>
+<tr><td>成员</td><td>Chao Xu</td><td>@Chao Xu</td><td>负责性能、压力与长稳专项测试</td></tr>
+<tr><td>成员</td><td></td><td></td><td>作为特性工作组测试负责人，设计 FIT 测试方案、用例和自测报告</td></tr>
+<tr><td>成员</td><td></td><td></td><td>作为特性工作组测试负责人，设计 FIT 测试方案、用例和自测报告</td></tr>
+<tr><td></td><td></td><td></td><td></td></tr>
 </tbody>
 </table>
 
@@ -109,17 +112,16 @@
 <h2>Test Timeline (per release cycle):</h2>
 <p><em>The detailed process (entry conditions, workflows, WG task division, deliverables and acceptance criteria per phase) is defined in the <a href="https://lf-networking.atlassian.net/wiki/spaces/OpenAN/pages/1544945667/OpenAN+Integration+Testing+Process+and+Framework">Integration Testing Process and Framework</a> §4.3.</em></p>
 
-<p><strong>OpenAN 26.12 Test Timeline</strong> (per the <a href="https://lf-networking.atlassian.net/wiki/spaces/OpenAN/pages/1187905545/OpenAN+26.12">OpenAN 26.12 release plan</a>, release on 2026-12-23; dates below are back-planned proposals and follow the release test plan):</p>
+<p><strong>OpenAN 26.12 Test Timeline</strong> (Handover 10-16 to 11-15; RC-0 10-30 to 11-25; RC-1 11-25 to 12-16; release on 2026-12-23; per the release plan):</p>
 <table>
 <thead>
-<tr><th>Dates</th><th>Phase</th><th>Key activities</th></tr>
+<tr><th>Dates</th><th>Version phase &amp; testing</th><th>Execution details</th></tr>
 </thead>
 <tbody>
-<tr><td>2026-10-26 ~ 11-15</td><td><strong>Handover (TRR)</strong></td><td>Rolling per-feature handover and review</td></tr>
-<tr><td>2026-11-02 ~ 11-22</td><td><strong>Requirement Test Acceptance</strong></td><td>FIT full self-test, SIT smoke and requirement acceptance (runs in parallel with handover)</td></tr>
-<tr><td>2026-11-23 ~ 12-08</td><td><strong>RC-0</strong></td><td>Full FIT/SIT regression, specialized testing started (performance, 7×24h stability, security, compatibility, A2A-T protocol)</td></tr>
-<tr><td>2026-12-09 ~ 12-22</td><td><strong>RC-1</strong></td><td>Full regression, specialized test wrap-up, quality data summary</td></tr>
-<tr><td>2026-12-23</td><td><strong>Release</strong></td><td>TSC Go/No-Go release review</td></tr>
+<tr><td>2026-10-16 ~ 11-15</td><td><strong>M4 Feature Freeze · Handover</strong></td><td>Test case/plan design and review (in parallel with RC-0)</td></tr>
+<tr><td>2026-10-30 ~ 11-25</td><td><strong>RC-0 · Full Testing</strong></td><td>Full FIT/SIT regression with specialized testing started; feature WGs provide self-test reports; requirement acceptance completed</td></tr>
+<tr><td>2026-11-25 ~ 12-16</td><td><strong>RC-1 · Pre-Release Testing</strong></td><td>RC-0 defect fix verification and pre-release full regression</td></tr>
+<tr><td>2026-12-23</td><td><strong>Release</strong></td><td>OpenAN 26.12 official release (TSC Go/No-Go)</td></tr>
 </tbody>
 </table>
 <table>
@@ -127,22 +129,26 @@
 <tr><th>Phase</th><th>Timing</th><th>Feature WG deliverables</th><th>Integration Testing WG deliverables</th></tr>
 </thead>
 <tbody>
-<tr><td><strong>Handover (TRR)</strong></td><td>After feature development</td><td>Test plan, test case table, FIT automated cases</td><td>Review comments and TRR conclusion</td></tr>
-<tr><td><strong>FIT Full Self-Test &amp; Requirement Acceptance</strong></td><td>After TRR review passed</td><td>FIT self-test report</td><td>SIT smoke results and requirement acceptance conclusion</td></tr>
-<tr><td><strong>RC-0</strong></td><td>After feature freeze and image build</td><td>P0/P1 defect closure records</td><td>RC-0 test report (full FIT/SIT regression + specialized testing started)</td></tr>
-<tr><td><strong>RC-1</strong></td><td>After RC-0 fixes</td><td>Residual issue list with risk acceptance</td><td>RC-1 test report and quality data summary (Go/No-Go input)</td></tr>
+<tr><td><strong>Handover (M4: test design and review)</strong></td><td>From M4 feature freeze to 11-15</td><td>Test plan, test case table, FIT automated cases</td><td>Review comments and TRR conclusion</td></tr>
+<tr><td><strong>RC-0 (full testing &amp; requirement acceptance)</strong></td><td>RC-0 version window</td><td>FIT self-test report, P0/P1 defect closure records</td><td>RC-0 test report (full FIT/SIT + specialized testing), requirement acceptance conclusion</td></tr>
+<tr><td><strong>RC-1 (pre-release testing)</strong></td><td>After RC-0 until release</td><td>Residual issue list with risk acceptance</td><td>RC-1 test report and quality data summary (Go/No-Go input)</td></tr>
 </tbody>
 </table>
 
 <h2>Current WG Members:</h2>
 <table>
 <thead>
-<tr><th>Role</th><th>Name</th><th>LF ID</th></tr>
+<tr><th>Role</th><th>Name</th><th>LF ID</th><th>Responsibilities</th></tr>
 </thead>
 <tbody>
-<tr><td>Lead</td><td>Xunli Yang</td><td>@Xunli Yang</td></tr>
-<tr><td>Member</td><td>Junjie Huang</td><td>@Junjie Huang</td></tr>
-<tr><td>Member</td><td></td><td></td></tr>
+<tr><td>Lead</td><td>Xunli Yang</td><td>@Xunli Yang</td><td>WG coordination; test process, test plans and release test quality management</td></tr>
+<tr><td>Member</td><td>Junjie Huang</td><td>@Junjie Huang</td><td>System and regression testing</td></tr>
+<tr><td>Member</td><td>Haowan Weng</td><td>@Haowan Weng</td><td>System and regression testing</td></tr>
+<tr><td>Member</td><td>Bo Gao</td><td>@Bo Gao</td><td>Security testing</td></tr>
+<tr><td>Member</td><td>Chao Xu</td><td>@Chao Xu</td><td>Performance, stress and stability testing</td></tr>
+<tr><td>Member</td><td></td><td></td><td>Serves as the feature WG test owner: designs FIT test plans, cases and self-test reports</td></tr>
+<tr><td>Member</td><td></td><td></td><td>Serves as the feature WG test owner: designs FIT test plans, cases and self-test reports</td></tr>
+<tr><td></td><td></td><td></td><td></td></tr>
 </tbody>
 </table>
 
