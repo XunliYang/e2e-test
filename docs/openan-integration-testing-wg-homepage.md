@@ -28,7 +28,7 @@ OpenAN 集成测试工作组负责社区统一的集成测试质量保障体系�
 
 > 各阶段前置条件、操作流程、工作组任务分工、交付物与验收内容的详细流程见《[集成测试流程及框架](https://lf-networking.atlassian.net/wiki/spaces/OpenAN/pages/1544945667/OpenAN+Integration+Testing+Process+and+Framework)》§4.3。
 
-**OpenAN 26.12 测试时间线**（转测 10-16~11-15；RC-0 10-30~11-25；RC-1 11-25~12-16；发布 2026-12-23；以版本计划为准）：
+**OpenAN 26.12 测试时间线**（依据 [OpenAN 26.12 发布计划](https://lf-networking.atlassian.net/wiki/spaces/OpenAN/pages/1187905545/OpenAN+26.12)，2026-12-23 发布；以下为按发布日倒推的建议排期，以版本测试计划为准）：
 
 ```mermaid
 gantt
@@ -46,8 +46,8 @@ gantt
     RC-0 测试报告（2026-11-25 截止）                                 :milestone, r0_report, 2026-11-25, 0d
 
     section RC-1 发布前测试
-    RC-1 发布前测试      :r1, 2026-11-25, 21d
-    RC-1 测试报告 · Go/No-Go 输入（2026-12-16 截止）                 :milestone, r1_report, 2026-12-16, 0d
+    RC-1 发布前测试      :r1, 2026-11-25, 25d
+    RC-1 测试报告 · Go/No-Go 输入（2026-12-20 截止）                 :milestone, r1_report, 2026-12-20, 0d
 
     section 版本发布
     正式发布（2026-12-23）                                      :milestone, release, 2026-12-23, 0d
@@ -108,7 +108,7 @@ The Integration Testing WG owns the community-wide integration testing quality s
 
 > The detailed process (entry conditions, workflows, WG task division, deliverables and acceptance criteria per phase) is defined in the [Integration Testing Process and Framework](https://lf-networking.atlassian.net/wiki/spaces/OpenAN/pages/1544945667/OpenAN+Integration+Testing+Process+and+Framework) §4.3.
 
-**OpenAN 26.12 Test Timeline** (Handover 10-16 to 11-15; RC-0 10-30 to 11-25; RC-1 11-25 to 12-16; release on 2026-12-23; per the release plan):
+**OpenAN 26.12 Test Timeline** (per the [OpenAN 26.12 release plan](https://lf-networking.atlassian.net/wiki/spaces/OpenAN/pages/1187905545/OpenAN+26.12), release on 2026-12-23; dates below are back-planned proposals and follow the release test plan):
 
 ```mermaid
 gantt
@@ -126,8 +126,8 @@ gantt
     RC-0 test report (by 2026-11-25)                                 :milestone, r0_report, 2026-11-25, 0d
 
     section RC-1 Pre-Release Testing
-    RC-1 Pre-Release Testing      :r1, 2026-11-25, 21d
-    RC-1 test report · Go/No-Go input (by 2026-12-16)                 :milestone, r1_report, 2026-12-16, 0d
+    RC-1 Pre-Release Testing      :r1, 2026-11-25, 25d
+    RC-1 test report · Go/No-Go input (by 2026-12-20)                 :milestone, r1_report, 2026-12-20, 0d
 
     section Release
     Official release (2026-12-23)                                      :milestone, release, 2026-12-23, 0d
