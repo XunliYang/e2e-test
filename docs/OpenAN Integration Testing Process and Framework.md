@@ -117,54 +117,40 @@ flowchart LR
 
 > Concrete dates follow each release plan (see the [OpenAN 26.12 Release Plan](https://lf-networking.atlassian.net/wiki/spaces/OpenAN/pages/1187905545/OpenAN+26.12)); deliverable templates are maintained in the `openan-itest` repository under `docs/templates/`.
 
-#### 4.3.1 Handover (TRR)
+#### 4.3.1 Handover (M4: Test Design and Review)
 
-**Entry conditions**: Feature development complete — code merged into mainline, images built, module-level UT gates met (coverage not decreased), smoke tests passed.
+**Entry conditions**: The M4 feature-freeze window opens; the feature requirement baseline is frozen.
 
 **Workflow:**
 
 1. The feature WG submits a handover issue in the `openan-itest` repository (linked to requirements and feature scope);
 2. Submits the test plan (per the [test plan template](https://github.com/project-openan/openan-itest/blob/main/docs/templates/test-plan-template.md)) and the case table (per the [test case table template](https://github.com/project-openan/openan-itest/blob/main/docs/templates/testcases-template.csv)) via PR, and merges the FIT automated test cases;
-3. The Integration Testing WG organizes the handover review (plan, cases, automation code);
-4. Upon approval the handover is complete and the execution phase starts.
+3. The Integration Testing WG organizes the review of the plan, cases and automation code;
+4. Upon approval the handover is complete.
 
 **Feature WG**: delivers the test plan, test case table and FIT automated test cases (merged into `e2e/<feature>/`).
 **Integration Testing WG**: organizes the review; delivers review comments and the TRR conclusion.
 **Acceptance**: test plan approved; cases conform to the standards (P0/P1 100% automated, requirement links filled); automated cases independently repeatable.
 
-#### 4.3.2 FIT Full Self-Test & Requirement Acceptance
+#### 4.3.2 RC-0 (Full Testing & Requirement Acceptance)
 
-**Entry conditions**: TRR review passed.
+**Entry conditions**: Feature development complete and full handover done; the RC-0 version image package built.
 
 **Workflow:**
 
 1. The feature WG test owner executes the full FIT self-test and produces the self-test report;
-2. The Integration Testing WG executes the SIT smoke cases;
-3. Coverage and pass-rate requirements are verified against the test report;
-4. Requirement acceptance completes once the requirements are met.
+2. The Integration Testing WG deploys the RC-0 image package and verifies deployment;
+3. Runs the full FIT/SIT regression and starts specialized testing (performance, 7×24h stability, security, compatibility, A2A-T protocol, etc.);
+4. Coverage and pass-rate requirements are verified against the test report, completing requirement acceptance;
+5. The feature WG fixes P0/P1 defects or provides workarounds; the Integration Testing WG publishes the RC-0 test report.
 
-**Feature WG**: delivers the FIT self-test report (per the [test report template](https://github.com/project-openan/openan-itest/blob/main/docs/templates/test-report-template.md)).
-**Integration Testing WG**: executes the SIT smoke; delivers smoke results and the requirement acceptance conclusion.
-**Acceptance**: pass rates meet Framework §8.2 (P0/P1 = 100%, overall ≥ 95%); coverage meets Framework §8.4 (requirement coverage 100%, API coverage ≥ 80%); failed cases archived with issues.
+**Feature WG**: delivers the FIT self-test report and defect closure records.
+**Integration Testing WG**: runs the regression and specialized testing; delivers the RC-0 test report and the requirement acceptance conclusion.
+**Acceptance**: pass rates meet Framework §8.2 (P0/P1 = 100%, overall ≥ 95%); coverage meets Framework §8.4 (requirement coverage 100%, API coverage ≥ 80%); defect handling within Framework §9.1 timelines; RC-0 test report published.
 
-#### 4.3.3 RC-0
+#### 4.3.3 RC-1 (Pre-Release Testing)
 
-**Entry conditions**: feature freeze; RC-0 version image package built.
-
-**Workflow:**
-
-1. The Integration Testing WG deploys the RC-0 image package and verifies deployment;
-2. Runs the full FIT/SIT regression;
-3. Starts specialized testing (performance, 7×24h stability, security, compatibility, A2A-T protocol, etc.);
-4. Publishes the RC-0 test report.
-
-**Feature WG**: fixes P0/P1 defects or provides workarounds; delivers defect closure records.
-**Integration Testing WG**: runs the regression and specialized testing; delivers the RC-0 test report (per the [test report template](https://github.com/project-openan/openan-itest/blob/main/docs/templates/test-report-template.md)).
-**Acceptance**: RC-0 test report published; defect handling within Framework §9.1 timelines; residual risks each with a named risk acceptor.
-
-#### 4.3.4 RC-1
-
-**Entry conditions**: RC-0 issues fixed; RC-1 version image package built.
+**Entry conditions**: RC-0 issues fixed; the RC-1 version image package built.
 
 **Workflow:**
 
