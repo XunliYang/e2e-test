@@ -1,0 +1,2 @@
+case_id,type,module,title,precondition,steps,expected_result,priority,language_profile,component_deps,protocol_primitive,notes
+FIT-RC-001,FIT,registry-center,注册合法Agent成功,registry-center服务已启动,1.POST /v1/agents 携带合法payload; 2.查询注册结果,返回201且可通过GET查询到该Agent,P0,python,none,none,示例行：生成时删除
