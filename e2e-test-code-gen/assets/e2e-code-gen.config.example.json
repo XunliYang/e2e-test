@@ -1,0 +1,22 @@
+{
+  "version": "1",
+  "project_root": "../registry-center",
+  "target_repo": "openan/registry-center",
+  "language_profile": "auto",
+  "input": {
+    "cases_csv": "../test-cases-generator/outputs/registry-center_Agent注册特性级集成测试用例.csv",
+    "case_ids": [],
+    "priority_filter": ["P0", "P1", "P2"]
+  },
+  "output": {
+    "dir": null,
+    "file_pattern": null
+  },
+  "env": {
+    "REGISTRY_CENTER_URL": "http://localhost:8080"
+  },
+  "options": {
+    "overwrite": false,
+    "verify_command": "uv run pytest --collect-only -q"
+  }
+}
