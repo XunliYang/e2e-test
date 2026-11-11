@@ -28,11 +28,11 @@ OpenAN 集成测试工作组负责社区统一的集成测试质量保障体系�
 
 > 各阶段前置条件、操作流程、工作组任务分工、交付物与验收内容的详细流程见《[集成测试流程及框架](https://lf-networking.atlassian.net/wiki/spaces/OpenAN/pages/1544945667/OpenAN+Integration+Testing+Process+and+Framework)》§4.3。
 
-**OpenAN 26.12 测试时间线**（依据 [OpenAN 26.12 发布计划](https://lf-networking.atlassian.net/wiki/spaces/OpenAN/pages/1187905545/OpenAN+26.12)，2026-12-23 发布；以下为按发布日倒推的建议排期，以版本测试计划为准）：
+**OpenAN 26-winter 测试时间线**（依据 [OpenAN 26-winter 发布计划](https://lf-networking.atlassian.net/wiki/spaces/OpenAN/pages/1187905545/OpenAN+26.12)，2026-12-23 发布；以下为按发布日倒推的建议排期，以版本测试计划为准）：
 
 ```mermaid
 gantt
-    title OpenAN 26.12 测试时间线
+    title OpenAN 26-winter 测试时间线
     dateFormat YYYY-MM-DD
     axisFormat %m-%d
     todayMarker off
@@ -108,11 +108,11 @@ The Integration Testing WG owns the community-wide integration testing quality s
 
 > The detailed process (entry conditions, workflows, WG task division, deliverables and acceptance criteria per phase) is defined in the [Integration Testing Process and Framework](https://lf-networking.atlassian.net/wiki/spaces/OpenAN/pages/1544945667/OpenAN+Integration+Testing+Process+and+Framework) §4.3.
 
-**OpenAN 26.12 Test Timeline** (per the [OpenAN 26.12 release plan](https://lf-networking.atlassian.net/wiki/spaces/OpenAN/pages/1187905545/OpenAN+26.12), release on 2026-12-23; dates below are back-planned proposals and follow the release test plan):
+**OpenAN 26-winter Test Timeline** (per the [OpenAN 26-winter release plan](https://lf-networking.atlassian.net/wiki/spaces/OpenAN/pages/1187905545/OpenAN+26.12), release on 2026-12-23; dates below are back-planned proposals and follow the release test plan):
 
 ```mermaid
 gantt
-    title OpenAN 26.12 Test Timeline
+    title OpenAN 26-winter Test Timeline
     dateFormat YYYY-MM-DD
     axisFormat %m-%d
     todayMarker off
