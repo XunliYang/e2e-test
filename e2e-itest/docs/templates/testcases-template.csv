@@ -1,4 +1,4 @@
-里程碑,用例名称,用例编号,特性名称,需求链接,用例类型,优先级,前置条件,步骤描述,预期结果,可自动化,对应自动化用例,开发负责人,测试负责人,备注
+里程碑,用例名称,用例编号,模块,需求链接,用例类型,优先级,前置条件,步骤描述,预期结果,可自动化,对应自动化用例,开发负责人,测试负责人,备注
 v26.12,注册AgentCard并查询（含mTLS客户端身份）,【FIT-registry-center-agentcard-001】,registry-center,https://github.com/project-openan/registry-center/issues/1,功能测试,P0,注册中心已按Helm部署且mTLS客户端证书已配置,"1、使用已配置客户端证书通过 POST /rest/v1/registry-center/agent-cards 提交签名后的AgentCard
 2、通过 GET /rest/v1/registry-center/agent-cards/{org}/{name} 查询该Agent","1、注册成功，返回成功状态
 2、查询返回字段与提交内容一致",是,,<开发负责人>,<测试负责人>,需先生成AgentCard签名（JWS RS256）
