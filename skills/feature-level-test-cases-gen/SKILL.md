@@ -1,11 +1,11 @@
 ﻿---
 name: feature-level-test-cases-gen
-description: 根据 openAN 特性提案、设计文档、API 文档与目标仓库源码，生成特性级集成测试（FIT）用例 CSV（12 列 openan 模板）。只产出业务功能正确性场景，不含 DFX 非功能专项；每条用例标注 language_profile 供 e2e-test-code-gen 直接消费。用户要求生成特性级集成测试用例、FIT 用例或特性集成测试表时使用。
+description: 根据 openAN 特性提案、设计文档、API 文档与目标仓库源码，生成特性级集成测试（FIT）用例 CSV（16 列用例表：openan 官方 15 列 + component_deps 独立列）。只产出业务功能正确性场景，不含 DFX 非功能专项；每条用例在备注标注 language_profile/component_deps/protocol_primitive 供 e2e-test-code-gen 直接消费。用户要求生成特性级集成测试用例、FIT 用例或特性集成测试表时使用。
 ---
 
 # Feature-level Test Cases Gen
 
-基于用户提供的特性材料，生成 **特性级集成测试（FIT）** 用例表（CSV，12 列固定模板，与 `templates/case-template.csv` 一致）。只产出 FIT，不生成单元测试、功能测试或 DFX 非功能专项用例。
+基于用户提供的特性材料，生成 **特性级集成测试（FIT）** 用例表（CSV，16 列 = openan 官方 15 列 + component_deps 独立列，与 `../test-cases-generator/templates/case-template.csv` 表头一致）。只产出 FIT，不生成单元测试、功能测试或 DFX 非功能专项用例。
 
 FIT **仅**保留业务功能正确性场景：部署就绪、主路径、功能配置变更、业务状态迁移、业务级负例校验。kill 进程 / 停止容器自愈、资源不足降级、依赖故障恢复、探针/日志/指标/性能/安全/兼容等一律不写入本表，归 DFX。归属规则以 [references/FIT与DFX场景归属判据.md](references/FIT与DFX场景归属判据.md) 为单一事实来源。
 
@@ -20,7 +20,7 @@ FIT **仅**保留业务功能正确性场景：部署就绪、主路径、功能
 - 归属判据 §1–§5：FIT 允许范围、禁止写入的 DFX 场景、错误推测法边界
 - §1 FIT 定义与核心原则（原子性、可重复性、可追溯性、完整性、独立性）；FIT 不含 DFX
 - §2 设计方法及选用规则：概览（§2.1）及等价类（§2.2）、边界值（§2.3）、正交试验（§2.4）、状态迁移（§2.5）、错误推测（§2.6，仅业务级负例）；须在备注标注所采用方法
-- §3 各字段填写要求、自检项与典型问题（含前置条件**环境要素明确化**，含 `language_profile` / `component_deps` / `protocol_primitive` 三列规则）；P2 不含「DFX 用例」
+- §3 各字段填写要求、自检项与典型问题（含前置条件**环境要素明确化**，含备注列 `language_profile` / `protocol_primitive` / `执行策略` / `环境` 键规则与第 5 列 `component_deps` 独立列规则）；P2 不含「DFX 用例」
 
 ### 现网样例 CSV（须对齐，非照搬条数）
 
@@ -28,13 +28,16 @@ FIT **仅**保留业务功能正确性场景：部署就绪、主路径、功能
 
 | 对齐项 | 样例体现 |
 |--------|----------|
-| 列结构 | 12 列表头顺序（`case_id`…`notes`） |
-| 编号 | `FIT-RC-001`（RC = registry-center 缩写）→ 当前特性 `FIT-<模块缩写>-<3位序号>` |
+| 列结构 | 16 列表头（openan 官方 15 列 + component_deps 第 5 列）（`里程碑,用例名称,用例编号,模块,component_deps,需求链接,用例类型,优先级,前置条件,步骤描述,预期结果,可自动化,对应自动化用例,开发负责人,测试负责人,备注`） |
+| 编号 | `FIT-registry-center-agentcard-001` → 当前特性 `FIT-<feature>-<topic>-<3位序号>`（feature=特性/仓库名，topic=功能场景，小写连字符） |
+| 用例类型 | 主路径/部署/配置/状态迁移填 `功能测试`；业务级负例填 `异常测试`；A2A-T 协议原语填 `协议测试` |
 | 前置/步骤序号 | 前置与步骤用 `1、`；预期用 `1.` `2.` |
+| 清理动作 | 步骤描述末步为清理（删除创建的测试数据/服务），预期结果含对应可判定断言 |
 | 场景分层 | P0：服务部署就绪、注册主路径、状态上报、功能配置更新；P1：并发/幂等下业务正确性、跨组件业务集成；P2：业务级负例与边界值。样例中「进程重启后数据保持」仅示书写风格，**新生成不得**将自愈/重启恢复写入 FIT（归 DFR） |
 | 断言粒度 | HTTP 状态码、响应体字段、查询结果等业务可观测结果 |
-| 三列新字段 | `language_profile` 每条必填（python/java/js/shell）；`component_deps` 无跨组件依赖填 `none`；A2A-T 协议用例 `protocol_primitive` 填原语，否则 `none` |
-| 可选 notes | 用户给了里程碑才写 `里程碑:vX.Y`；**未给则不写，不从材料推断** |
+| 可自动化 | P0/P1 行必须为 `是`（框架 §8.1 TRR 准入）；P2 可为 `否` 并在备注说明原因 |
+| 备注键 | 每条必填 `language_profile`（python/java/js/shell）、`protocol_primitive`（A2A-T 用例填原语，否则 `none`）、`环境`（框架 §6.4/§4.3.1，如 docker-compose、with-workload-cluster、online、offline）、`执行策略`（smoke/full/slow）；另写 `设计方法:xxx` |
+| 用户必填列 | 样例中「里程碑」「需求链接」「开发/测试负责人」可为空；**仍遵守本 skill 用户必填列规则**，不因样例有填而推断用户未给的值 |
 
 用户另指定参考 CSV 时，列序与风格以用户文件为准；编写指导仍为字段合规底线。
 
@@ -45,8 +48,9 @@ FIT **仅**保留业务功能正确性场景：部署就绪、主路径、功能
 | 特性材料（至少其一，**必填**） | 特性提案、设计文档、API 文档、用户手册 |
 | 可选：目标仓库源码 | openAN 各仓（Python / Java / JS / Shell 服务、docker-compose 编排、A2A-T SDK） |
 | 可选：参考用例 CSV | 覆盖默认样例的风格基准；未指定则用 `references/registry-center-Agent注册-特性级集成测试用例.csv` |
-| 特性/模块名称（**必填**） | 写入 `module` 列并用于文件命名；缺失则停止，禁止从材料推断 |
-| 里程碑（可选） | 用户指定版本（如 `v1.0`）时写入备注 `里程碑:v1.0`；未指定则 notes 不写 |
+| 特性/模块名称（**必填**） | 写入「模块」列并用于文件命名与编号 feature 段；缺失则停止，禁止从材料推断 |
+| 需求链接（可选） | 需求/Issue/PR 链接清单（如 `https://github.com/project-openan/registry-center/issues/1`）；写入「需求链接」列。未指定时从材料提取；材料中亦无则该列留空并记入信息缺口清单 |
+| 里程碑（可选） | 用户指定版本（如 `v26.12`）时写入「里程碑」列；未指定则该列留空 |
 | 输出路径 | 未指定则建议 `outputs/<目标仓库>_<特性名称>特性级集成测试用例.csv`（如 `outputs/registry-center_Agent注册特性级集成测试用例.csv`）；用户给定路径时从其 |
 
 缺特性材料或特性/模块名称则**停止**，一次性列出缺失项；不创建目录、不写 CSV。未由用户指定的可选项一律**留空**，禁止推断或占位。其它缺失项写入**信息缺口清单**；不虚构未在材料中出现的 API 行为。
@@ -57,13 +61,13 @@ FIT **仅**保留业务功能正确性场景：部署就绪、主路径、功能
 
 交付顺序：**信息缺口清单**（如有）→ **覆盖策略摘要** → **CSV 文件** → **质量自检**。
 
-### CSV 表头（12 列，固定）
+### CSV 表头（16 列，固定，openan 官方模板）
 
 ```csv
-case_id,type,module,title,precondition,steps,expected_result,priority,language_profile,component_deps,protocol_primitive,notes
+里程碑,用例名称,用例编号,模块,component_deps,需求链接,用例类型,优先级,前置条件,步骤描述,预期结果,可自动化,对应自动化用例,开发负责人,测试负责人,备注
 ```
 
-> openan 模板不含 openfuyao 的「可自动化 / 对应自动化用例 / 开发负责人 / 测试负责人」列：自动化映射由 `e2e-test-code-gen` 生成代码时产出「用例 ID ↔ 测试文件映射表」承担，本表不再跟踪。
+> 表头与 openan-itest `docs/templates/testcases-template.csv` 一致（唯一事实来源：`../test-cases-generator/templates/case-template.csv`）。`component_deps` 为第 5 列独立列；`language_profile`/`protocol_primitive` 以键值对写在「备注」列（`；`分隔），供 `e2e-test-code-gen` 解析消费；「对应自动化用例」生成阶段留空，由 `e2e-test-code-gen` 生成代码后回填 `<测试文件>::<测试函数>`。
 
 ### 字段规则（与编写指导 §3 对齐）
 
@@ -71,30 +75,33 @@ case_id,type,module,title,precondition,steps,expected_result,priority,language_p
 
 | 列 | 规则 |
 |----|------|
-| notes 中的 `里程碑:vX.Y` | 用户指定发布版本时填写；未指定不写 |
+| 里程碑 | 用户指定发布版本时填写 |
+| 模块 | 用户指定特性/模块名称时填写 |
+| 需求链接 | 用户指定或材料中含需求/Issue/PR 链接时填写；均无则留空并记入信息缺口清单 |
+| 对应自动化用例 | 生成阶段留空；自动化落地后回填 |
+| 开发负责人 | 用户指定时填写 |
+| 测试负责人 | 用户指定时填写 |
 
 **可由生成过程填写**（须符合编写指导 §3 各字段规则）：
 
 | 列 | 要点 |
 |----|------|
-| case_id | `FIT-<模块缩写>-<3位序号>`，如 `FIT-RC-001`；仓库内唯一；见指导 §3「case_id」 |
-| type | 固定 `FIT` |
-| module | 被测模块/组件（openan 仓名或仓内模块名）；与 case_id 模块缩写保持一致 |
-| title | 动宾短语，≤50 字；见指导 §3「title」 |
-| priority | P0/P1/P2 定义见指导 §3「priority」 |
-| precondition | `1、` 序号，≤10 步，描述环境/服务/数据状态，**环境要素明确化**（镜像版本、compose 服务、端口、网络、鉴权 token、测试数据等），不含操作步骤；见指导 §3「precondition」 |
-| steps | 可执行、独立编号、`见结果N`；写明接口入口与参数；见指导 §3「steps」 |
-| expected_result | 可客观判定（HTTP 状态码、响应体字段、查询结果），禁止模糊；见指导 §3「expected_result」 |
-| language_profile | **每条必填**：`python` / `java` / `js` / `shell`；默认取被测仓主语言，跨仓用例取测试落地方语言；供 `e2e-test-code-gen` 直接消费 |
-| component_deps | **每条必填**：无跨组件依赖填 `none`；否则填 openan 依赖仓（如 `orchestration-center`）；多个用 `\|` 分隔 |
-| protocol_primitive | 涉及 A2A-T 协议的用例必填：`Task-T` / `Notification-T` / `Negotiation-T` / `Authorization-T`；否则填 `none` |
-| notes | `设计方法:xxx`（指导 §2 要求标注）；`正交因子:因子A=值1\|因子B=值2`；里程碑；材料差异、待确认项 |
+| 用例名称 | 动宾短语，≤50 字；见指导 §3「用例名称」 |
+| 用例编号 | `FIT-<feature>-<topic>-<3位序号>`，如 `FIT-registry-center-agentcard-001`；feature 取特性/仓库名（与「模块」列一致的小写连字符形式），topic 为功能场景小写连字符；产品内唯一；见指导 §3「用例编号」 |
+| 用例类型 | 主路径/部署/配置/状态迁移填 `功能测试`；业务级负例填 `异常测试`；A2A-T 协议原语用例填 `协议测试` |
+| 优先级 | P0/P1/P2 定义见指导 §3「优先级」 |
+| 前置条件 | `1、` 序号，≤10 步，描述环境/服务/数据状态，**环境要素明确化**（镜像版本、compose 服务、端口、网络、鉴权 token、测试数据等），不含操作步骤；见指导 §3「前置条件」 |
+| 步骤描述 | 可执行、独立编号、`见结果N`；写明接口入口与参数；**末步必须为清理动作**（框架 §6.3，删除本用例创建的测试数据/服务）；见指导 §3「步骤描述」 |
+| 预期结果 | 可客观判定（HTTP 状态码、响应体字段、查询结果），禁止模糊；编号与步骤对应，含清理步骤的可判定断言；见指导 §3「预期结果」 |
+| 可自动化 | `是`/`否`；P0/P1 必须为 `是`（框架 §8.1）；P2 填 `否` 时在备注说明原因 |
+| 备注 | `设计方法:xxx`（指导 §2 要求标注）；`正交因子:因子A=值1\|因子B=值2`；每条必填 `language_profile:python\|java\|js\|shell`、`protocol_primitive:none\|Task-T\|Notification-T\|Negotiation-T\|Authorization-T`、`环境:<运行环境>`（框架 §6.4 environment 维度，如 `docker-compose`、`with-workload-cluster`、`online`、`offline`，供 CI 环境过滤）、`执行策略:smoke\|full\|slow`（供 e2e-test-code-gen 与 CI 触发过滤消费）；材料差异、待确认项、不可自动化原因 |
 
 ### CSV 书写
 
 - 多行单元格双引号包裹，内保留换行。
 - 设计方法无独立列时写在备注：`设计方法:场景法`。
 - 正交组合：`正交因子:因子A=值1|因子B=值2`。
+- 备注各键用 `；`（或 `;`）分隔，键值内多个取值用 `|`；第 5 列 `component_deps` 多个组件同样用 `|` 分隔（如 `registry-center|orchestration-center`）。
 - 文件必须为 **UTF-8 带 BOM**（EF BB BF）：无 BOM 时 Excel/WPS 直接打开会按系统 ANSI（中文 Windows 为 GBK）解码，中文显示乱码。CSV 写入后必须执行 `node scripts/ensure-bom.cjs <CSV路径>`（脚本位于本 skill 目录，从其它目录执行时使用本 skill 的绝对路径）；输出含 `[FAIL]` 时先处理再交付，重复执行幂等。
 
 ### 条目数
@@ -135,22 +142,21 @@ case_id,type,module,title,precondition,steps,expected_result,priority,language_p
 2. 阅读用户提供的提案/文档/目标仓库源码；若用户指定其它参考 CSV，则以其替代默认样例作风格基准
 3. 归纳能力边界、环境依赖、关键接口与可观测验收点（状态码、响应字段、查询结果）
 4. 列出候选用例 → **对照归属判据剔除 DFX 场景**（进程/容器自愈、资源不足降级、依赖故障恢复、探针/日志/指标专项等）→ 最小集 + 扩展集 → 确定条数；为每条选定设计方法（备注标注）
-5. 逐条编写 12 列，对照编写指导 §3、归属判据与样例书写风格自检
+5. 逐条编写 16 列，对照编写指导 §3、归属判据与样例书写风格自检
 6. 写入 CSV → 执行 `node scripts/ensure-bom.cjs <CSV路径>` 确保带 UTF-8 BOM（见「CSV 书写」）→ 输出覆盖摘要（声明已按归属判据排除的 DFX 场景）与质量自检
 
 ## 质量自检
 
 - [ ] CSV 为 UTF-8 带 BOM（`scripts/ensure-bom.cjs` 执行结果为 `[OK]`）
 - [ ] 已对照归属判据与编写指导 §1–§3（含 §2.1–§2.6 设计方法）与 reference 现网样例 CSV 的列结构、编号与书写风格
-- [ ] `type` 列均为 `FIT`；12 列表头顺序与 `templates/case-template.csv` 一致
+- [ ] 用例类型均为 `功能测试`/`异常测试`/`协议测试`；16 列表头顺序与官方模板一致
 - [ ] **无 DFX 越界**：不包含进程/容器自愈、资源不足降级、依赖故障恢复、探针/日志/指标/性能/安全/兼容专项
-- [ ] `case_id` 唯一且符合 `FIT-<模块缩写>-<3位序号>`；`title` ≤50 字且无大量相互包含
-- [ ] 前置条件含环境要素明确化；步骤、预期符合指导 §3（序号、`见结果N`、可客观判定）
-- [ ] 备注含设计方法（指导 §2 要求标注）
-- [ ] `language_profile` 每条必填且为 python/java/js/shell 之一；`component_deps` 每条必填；A2A-T 用例 `protocol_primitive` 已填
-- [ ] P0 含服务部署就绪与核心主路径；业务级关键负例有覆盖（非 DFR/DFP）
+- [ ] 用例编号唯一且符合 `FIT-<feature>-<topic>-<3位序号>`；用例名称≤50 字且无大量相互包含
+- [ ] 前置条件含环境要素明确化；步骤末步为清理动作；步骤、预期符合指导 §3（序号、`见结果N`、可客观判定）
+- [ ] 备注含设计方法（指导 §2 要求标注）及 `language_profile`/`protocol_primitive`/`环境`/`执行策略` 键；第 5 列 `component_deps` 已填（none 或 openan 仓名）
+- [ ] P0/P1 行「可自动化」为「是」；P0 含服务部署就绪与核心主路径；业务级关键负例有覆盖（非 DFR/DFP）
 - [ ] 条数由覆盖推导，非模板固定；未编造不存在的行为
-- [ ] 里程碑未指定时 notes 未写；可选元数据未推断占位
+- [ ] 里程碑、需求链接、对应自动化用例、开发/测试负责人：用户未指定且材料未提供时均为空，缺口已列入信息缺口清单
 
 ## 调用示例
 

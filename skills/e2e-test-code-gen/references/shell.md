@@ -22,7 +22,7 @@ tests/
 
 ## 命名与约定
 
-- 用例：`@test "<script>: <action> <expected outcome>"`，用例 ID 放最前，如 `@test "FIT-INS-001: installer 缺参数时打印用法并退出 1"`
+- 用例：`@test "<script>: <action> <expected outcome>"`，用例 ID 放最前，如 `@test "DFX-ofpower-install-invalid-input-001: installer 缺参数时打印用法并退出 1"`
 - 每个用例独立 setup/teardown，不依赖执行顺序
 - 被测脚本以绝对路径调用（`"$BATS_TEST_DIRNAME/../../binary/installer.sh"`），不 `cd` 进被测目录
 
@@ -32,7 +32,7 @@ tests/
 #!/usr/bin/env bats
 load helpers/setup
 
-@test "FIT-INS-001: installer 缺参数时打印用法并退出 1" {
+@test "DFX-ofpower-install-invalid-input-001: installer 缺参数时打印用法并退出 1" {
     run "$BATS_TEST_DIRNAME/../../binary/installer.sh"
     [ "$status" -eq 1 ]
     [[ "$output" == *"Usage"* ]]

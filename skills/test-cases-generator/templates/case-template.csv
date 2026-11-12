@@ -1,2 +1,13 @@
-case_id,type,module,title,precondition,steps,expected_result,priority,language_profile,component_deps,protocol_primitive,notes
-FIT-RC-001,FIT,registry-center,注册合法Agent成功,registry-center服务已启动,1.POST /v1/agents 携带合法payload; 2.查询注册结果,返回201且可通过GET查询到该Agent,P0,python,none,none,示例行：生成时删除
+﻿里程碑,用例名称,用例编号,模块,component_deps,需求链接,用例类型,优先级,前置条件,步骤描述,预期结果,可自动化,对应自动化用例,开发负责人,测试负责人,备注
+v26.12,FIT-registry-center-agentcard-001 - Register AgentCard and query it,FIT-registry-center-agentcard-001,registry-center,none,https://github.com/project-openan/registry-center/issues/1,功能测试,P0,"1、registry-center 已按 docker compose 部署且健康检查通过
+2、已准备合法 AgentCard payload","1、POST /rest/v1/registry-center/agent-cards 提交 AgentCard 见结果1
+2、GET /rest/v1/registry-center/agent-cards/{org}/{name} 查询该 AgentCard 见结果2
+3、清理：删除本次注册的 AgentCard","1. 注册成功，返回 201
+2. 查询返回字段与提交内容一致
+3. 再次查询返回 404，测试数据已清理",是,,<开发负责人>,<测试负责人>,设计方法:场景法；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:smoke
+v26.12,DFX-registry-center-reliability-001 - Service self-heals after registry-center container stop,DFX-registry-center-reliability-001,registry-center,none,https://github.com/project-openan/registry-center/issues/9,可靠性测试,P1,"1、registry-center 已部署且已注册至少 1 个 Agent
+2、docker compose 环境可用","1、记录当前已注册 Agent 列表
+2、docker compose stop registry-center 停止服务
+3、docker compose start registry-center 恢复服务 见结果1
+4、清理：删除测试注册的 Agent 数据","1. 服务恢复后原 Agent 仍可查询、无数据丢失，进程自动拉起无需人工干预
+2. 清理后查询返回 404",是,,<开发负责人>,<测试负责人>,DFX类型:DFR；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:full

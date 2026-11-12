@@ -1,11 +1,11 @@
 ---
 name: dfx-test-cases-gen
-description: 根据 openAN 特性提案、设计文档、API 文档、使用手册、目标仓库源码与 FIT 用例，生成 DFX（Design for X）非功能测试用例 CSV（12 列 openan 模板）。只产出非功能专项，不复制 FIT 业务主路径与业务负例；每条用例标注 language_profile 供 e2e-test-code-gen 直接消费。用户要求生成 DFX 测试用例，或 DFT/DFD/DFS/DFR/DFP/DFNS/DFC 等非功能集成测试表时使用。
+description: 根据 openAN 特性提案、设计文档、API 文档、使用手册、目标仓库源码与 FIT 用例，生成 DFX（Design for X）非功能测试用例 CSV（16 列用例表：openan 官方 15 列 + component_deps 独立列）。只产出非功能专项，不复制 FIT 业务主路径与业务负例；每条用例在备注标注 language_profile/component_deps/protocol_primitive 供 e2e-test-code-gen 直接消费。用户要求生成 DFX 测试用例，或 DFT/DFD/DFS/DFR/DFP/DFNS/DFC 等非功能集成测试表时使用。
 ---
 
 # DFX Test Cases Gen
 
-基于用户提供的特性材料，生成 **DFX（Design for X）** 非功能专项测试用例表（CSV，12 列固定模板，与 `templates/case-template.csv` 一致）。只产出 DFX 用例，不生成单元测试、功能测试或特性级集成测试（FIT）用例。
+基于用户提供的特性材料，生成 **DFX（Design for X）** 非功能专项测试用例表（CSV，16 列 = openan 官方 15 列 + component_deps 独立列，与 `../test-cases-generator/templates/case-template.csv` 表头一致）。只产出 DFX 用例，不生成单元测试、功能测试或特性级集成测试（FIT）用例。
 
 DFX 测试验证系统可运维、可观测、可部署、高可靠、性能可控等非功能设计能力。凡以非功能设计能力为验证目标——探针 / 日志 / 指标 / 自愈 / 性能 / 安全 / 兼容——的用例一律归 DFX；业务功能正确性场景归 FIT，禁止细化复制。归属规则以 [references/FIT与DFX场景归属判据.md](references/FIT与DFX场景归属判据.md) 为单一事实来源。
 
@@ -19,14 +19,14 @@ DFX 测试验证系统可运维、可观测、可部署、高可靠、性能可�
 
 1. **[references/FIT与DFX场景归属判据.md](references/FIT与DFX场景归属判据.md)** — FIT/DFX 场景归属主规则；非法输入、配置变更等与 FIT 的切分（**先于编写指导**）
 2. **[references/DFX测试用例编写指导.md](references/DFX测试用例编写指导.md)** — DFX 定义（§1）、七类设计方法与通用校验点（§2.1–§2.7）与字段细则（§3）
-3. **[references/registry-center-Agent注册-特性级集成测试用例.csv](references/registry-center-Agent注册-特性级集成测试用例.csv)** — 12 列 CSV 的列序、多行单元格与序号写法（**仅作格式与书写风格参考**，场景须按当前特性 DFX 需求重写）
+3. **[references/registry-center-Agent注册-DFX测试用例.csv](references/registry-center-Agent注册-DFX测试用例.csv)** — DFX 七维样例（DFT/DFD/DFS/DFR/DFP/DFNS/DFC 各一条），展示 16 列列序、多行单元格、清理步骤、`DFX类型` 与备注编排键写法（书写风格参考，场景须按当前特性 DFX 需求重写）
 
 ### 编写指导（须覆盖）
 
 - 归属判据：非法输入/配置变更/故障注入与 FIT 的切分；禁止复制 FIT 业务主路径
 - §1 DFX 定义：面向全生命周期的非功能专项验证；与 FIT 按验证目标划分
-- §2 常见 DFX 分类与测试用例设计方法：DFT、DFD、DFS、DFR、DFP、DFNS、DFC 各类的**核心验证目标**、**通用校验点**与标准用例示例（§2.1–§2.7）
-- §3 各字段填写要求、自检项与典型问题（含前置条件**环境要素明确化**，含 `language_profile` / `component_deps` / `protocol_primitive` 三列规则）
+- §2 常见 DFX 分类与测试用例设计方法：DFT、DFD、DFS、DFR、DFP、DFNS、DFC 各类的**核心验证目标**、**通用校验点**、标准用例示例（§2.1–§2.7）与 DFX 类型 → 用例类型映射
+- §3 各字段填写要求、自检项与典型问题（含前置条件**环境要素明确化**，含备注列 `language_profile` / `protocol_primitive` / `执行策略` / `环境` / `DFX类型` 键规则与第 5 列 `component_deps` 独立列规则）
 
 ### 现网 CSV 书写风格（须对齐，非照搬条数）
 
@@ -34,13 +34,15 @@ DFX 测试验证系统可运维、可观测、可部署、高可靠、性能可�
 
 | 对齐项 | 要求 |
 |--------|------|
-| 列结构 | 12 列表头顺序（`case_id`…`notes`） |
-| 编号 | 样例为 `FIT-RC-001` 仅示序号格式；本 skill 使用 `DFX-<模块缩写>-<3位序号>`，如 `DFX-RC-001` |
+| 列结构 | 16 列表头（openan 官方 15 列 + component_deps 第 5 列）（`里程碑,用例名称,用例编号,模块,component_deps,需求链接,用例类型,优先级,前置条件,步骤描述,预期结果,可自动化,对应自动化用例,开发负责人,测试负责人,备注`） |
+| 编号 | 样例为 `FIT-registry-center-agentcard-001` 仅示格式；本 skill 使用 `DFX-<feature>-<topic>-<3位序号>`，如 `DFX-registry-center-agentcard-001`（feature=特性/仓库名，topic=非功能场景，小写连字符） |
+| 用例类型 | 按 DFX 类型映射：DFT→`可测试性测试`、DFD→`可诊断性测试`、DFS→`可运维性测试`、DFR→`可靠性测试`（长稳类 `稳定性测试`）、DFP→`性能测试`（压测类 `压力测试`）、DFNS→`安全测试`、DFC→`兼容性测试`；且在备注写 `DFX类型:DFx` |
 | 前置/步骤序号 | 前置与步骤用 `1、`；预期用 `1.` `2.` |
+| 清理动作 | 步骤描述末步为清理（恢复配置、删除注入的故障/产生的数据/临时容器） |
 | 断言粒度 | 接口返回码、health/探针状态、日志级别与关键字、metrics 端点指标、资源曲线（docker stats）等可客观判定项 |
-| 场景分层 | P0：核心可探测/可运维主路径；P1：关键诊断与可靠性；P2：性能边界、扩展 DFX 场景 |
-| 三列新字段 | `language_profile` 每条必填（python/java/js/shell）；`component_deps` 无跨组件依赖填 `none`；A2A-T 协议用例 `protocol_primitive` 填原语，否则 `none` |
-| 可选 notes | 用户给了里程碑才写 `里程碑:vX.Y`；**未给则不写，不从材料推断** |
+| 场景分层 | P0：核心可探测/可运维主路径；P1：关键诊断与可靠性；P2：性能边界、扩展 DFX 场景；P0/P1 行「可自动化」必须为 `是` |
+| 备注键 | 每条必填 `language_profile`（python/java/js/shell）、`protocol_primitive`（A2A-T 用例填原语，否则 `none`）、`环境`（框架 §6.4/§4.3.1，如 docker-compose、online、offline）、`执行策略`（smoke/full/slow）、`DFX类型:DFx` |
+| 用户必填列 | 用户给了里程碑才写「里程碑」列；**未给则留空，不从材料推断**；「需求链接」「开发/测试负责人」同理 |
 
 用户另指定参考 CSV 时，列序与风格以用户文件为准；编写指导仍为字段合规底线。
 
@@ -49,9 +51,10 @@ DFX 测试验证系统可运维、可观测、可部署、高可靠、性能可�
 | 输入 | 说明 |
 |------|------|
 | **特性材料（至少其一，必填）** | 特性提案、设计文档、接口/API 文档、用户手册/运维文档、目标仓库源码、特性级集成测试用例（FIT）等 |
-| 可选：参考用例 CSV | 覆盖默认书写风格；未指定则用 `references/registry-center-Agent注册-特性级集成测试用例.csv` |
-| 特性/模块名称（**必填**） | 写入 `module` 列并用于文件命名；缺失则停止，禁止从材料推断 |
-| 里程碑（可选） | 用户指定版本（如 `v1.0`）时写入备注 `里程碑:v1.0`；未指定则 notes 不写 |
+| 可选：参考用例 CSV | 覆盖默认书写风格；未指定则用 `references/registry-center-Agent注册-DFX测试用例.csv` |
+| 特性/模块名称（**必填**） | 写入「模块」列并用于文件命名与编号 feature 段；缺失则停止，禁止从材料推断 |
+| 需求链接（可选） | 需求/Issue/PR 链接清单；写入「需求链接」列。未指定时从材料提取；材料中亦无则该列留空并记入信息缺口清单 |
+| 里程碑（可选） | 用户指定版本（如 `v26.12`）时写入「里程碑」列；未指定则该列留空 |
 | 输出路径 | 未指定则建议 `outputs/<目标仓库>_<特性名称>DFX测试用例.csv`（如 `outputs/registry-center_Agent注册DFX测试用例.csv`）；用户给定路径时从其 |
 
 **硬性要求**：用户未提供任何特性材料（提案、设计、接口、用户文档、源码、FIT 用例等）时，**不得开始生成**，应提示用户至少提供一项参考材料。
@@ -64,13 +67,13 @@ DFX 测试验证系统可运维、可观测、可部署、高可靠、性能可�
 
 交付顺序：**信息缺口清单**（如有）→ **覆盖策略摘要**（含选用的 DFX 类型及理由）→ **CSV 文件** → **质量自检**。
 
-### CSV 表头（12 列，固定）
+### CSV 表头（16 列，固定，openan 官方模板）
 
 ```csv
-case_id,type,module,title,precondition,steps,expected_result,priority,language_profile,component_deps,protocol_primitive,notes
+里程碑,用例名称,用例编号,模块,component_deps,需求链接,用例类型,优先级,前置条件,步骤描述,预期结果,可自动化,对应自动化用例,开发负责人,测试负责人,备注
 ```
 
-> openan 模板不含 openfuyao 的「可自动化 / 对应自动化用例 / 开发负责人 / 测试负责人」列：自动化映射由 `e2e-test-code-gen` 生成代码时产出「用例 ID ↔ 测试文件映射表」承担，本表不再跟踪。
+> 表头与 openan-itest `docs/templates/testcases-template.csv` 一致（唯一事实来源：`../test-cases-generator/templates/case-template.csv`）。`component_deps` 为第 5 列独立列；`language_profile`/`protocol_primitive`/`执行策略`/`环境`/`DFX类型` 以键值对写在「备注」列（`；`分隔），供 `e2e-test-code-gen` 解析消费；「对应自动化用例」生成阶段留空，由 `e2e-test-code-gen` 生成代码后回填 `<测试文件>::<测试函数>`。
 
 ### 字段规则（与编写指导 §3 对齐）
 
@@ -78,24 +81,26 @@ case_id,type,module,title,precondition,steps,expected_result,priority,language_p
 
 | 列 | 规则 |
 |----|------|
-| notes 中的 `里程碑:vX.Y` | 用户指定发布版本时填写；未指定不写 |
+| 里程碑 | 用户指定发布版本时填写；未指定不写 |
+| 模块 | 用户指定特性/模块名称时填写 |
+| 需求链接 | 用户指定或材料中含需求/Issue/PR 链接时填写；均无则留空并记入信息缺口清单 |
+| 对应自动化用例 | 生成阶段留空；自动化落地后回填 |
+| 开发负责人 | 用户指定时填写 |
+| 测试负责人 | 用户指定时填写 |
 
 **可由生成过程填写**（须符合编写指导 §3 各字段规则）：
 
 | 列 | 要点 |
 |----|------|
-| case_id | `DFX-<模块缩写>-<3位序号>`，如 `DFX-RC-001`；仓库内唯一；见指导 §3「case_id」 |
-| type | **该条用例所属的 DFX 类型简写**：`DFT` / `DFD` / `DFS` / `DFR` / `DFP` / `DFNS` / `DFC`；一条用例仅对应一种 DFX 类型 |
-| module | 被测模块/组件（openan 仓名或仓内模块名）；与 case_id 模块缩写保持一致 |
-| title | 动宾短语，≤50 字；建议以 DFX 简写前缀表达意图，如「验证健康探测端点可被自动化调用」；见指导 §3「title」 |
-| priority | DFX 用例多为 P2（见指导 §3「priority」）；核心验收级可观测/运维能力可为 P0/P1，须在覆盖摘要中说明 |
-| precondition | `1、` 序号，≤10 步，描述环境/服务/组件状态/监控工具，**环境要素明确化**（镜像版本、compose 服务、端口、metrics 端点等），不含操作步骤；见指导 §3「precondition」 |
-| steps | **必须可执行、无歧义**；独立编号；写明命令、接口路径、参数、观测窗口；需检查结果的步骤加 `见结果N`；见指导 §3「steps」 |
-| expected_result | **尽量详细、可客观判定**；含 HTTP 状态码、日志级别与关键字、指标名与阈值、health/metrics 端点字段、容器/进程资源数据等；禁止「正常」「无异常」等模糊表述；见指导 §3「expected_result」 |
-| language_profile | **每条必填**：`python` / `java` / `js` / `shell`；默认取被测仓主语言，跨仓用例取测试落地方语言；供 `e2e-test-code-gen` 直接消费 |
-| component_deps | **每条必填**：无跨组件依赖填 `none`；否则填 openan 依赖仓（如 `orchestration-center`）；多个用 `\|` 分隔 |
-| protocol_primitive | 涉及 A2A-T 协议的用例必填：`Task-T` / `Notification-T` / `Negotiation-T` / `Authorization-T`；否则填 `none` |
-| notes | 校验点来源（设计文档章节/源码路径）；材料差异、待确认项、里程碑（可选） |
+| 用例名称 | 动宾短语，≤50 字；建议以 DFX 简写前缀表达意图，如「验证健康探测端点可被自动化调用」；见指导 §3「用例名称」 |
+| 用例编号 | `DFX-<feature>-<topic>-<3位序号>`，如 `DFX-registry-center-agentcard-001`；feature 取特性/仓库名（与「模块」列一致的小写连字符形式），topic 为非功能场景小写连字符；产品内唯一；见指导 §3「用例编号」 |
+| 用例类型 | 按 DFX 类型映射：`可测试性测试`/`可诊断性测试`/`可运维性测试`/`可靠性测试`/`稳定性测试`/`性能测试`/`压力测试`/`安全测试`/`兼容性测试`；一条用例仅对应一种 DFX 类型（指导 §2 映射表） |
+| 优先级 | DFX 用例多为 P2（见指导 §3「优先级」）；核心验收级可观测/运维能力可为 P0/P1，须在覆盖摘要中说明 |
+| 前置条件 | `1、` 序号，≤10 步，描述环境/服务/组件状态/监控工具，**环境要素明确化**（镜像版本、compose 服务、端口、metrics 端点等），不含操作步骤；见指导 §3「前置条件」 |
+| 步骤描述 | **必须可执行、无歧义**；独立编号；写明命令、接口路径、参数、观测窗口；需检查结果的步骤加 `见结果N`；**末步必须为清理动作**（恢复配置、删除注入的故障与测试数据）；见指导 §3「步骤描述」 |
+| 预期结果 | **尽量详细、可客观判定**；含 HTTP 状态码、日志级别与关键字、指标名与阈值、health/metrics 端点字段、容器/进程资源数据等；禁止「正常」「无异常」等模糊表述；见指导 §3「预期结果」 |
+| 可自动化 | `是`/`否`；P0/P1 必须为 `是`（框架 §8.1）；P2 填 `否` 时在备注说明原因 |
+| 备注 | 必填 `DFX类型:DFx`（DFT/DFD/DFS/DFR/DFP/DFNS/DFC，与用例编号中的段一致）；每条必填 `language_profile:python\|java\|js\|shell`、`protocol_primitive:none\|Task-T\|Notification-T\|Negotiation-T\|Authorization-T`、`环境:<运行环境>`（框架 §6.4，如 `docker-compose`、`with-workload-cluster`、`online`、`offline`，供 CI 环境过滤）、`执行策略:smoke\|full\|slow`；另写校验点来源（设计文档章节/源码路径）、材料差异、待确认项 |
 
 ### CSV 书写
 
@@ -163,7 +168,7 @@ case_id,type,module,title,precondition,steps,expected_result,priority,language_p
 3. 阅读用户指定的提案/设计/接口/用户文档/源码/FIT 用例；若用户指定其它参考 CSV，以其作风格基准
 4. **DFX 类型分析**：归纳适用类型（DFT/DFD/DFS/DFR/DFP/DFNS/DFC）及不适用类型与理由
 5. 列出候选用例 → **对照归属判据剔除 FIT 业务复制**（以业务结果为唯一断言的主路径、功能配置生效、业务负例拒绝）→ 最小集 + 扩展集 → 确定条数；每条绑定一种 DFX 类型
-6. 逐条编写 12 列，**步骤与预期结果尽量详细**，对照编写指导 §3、归属判据与 CSV 书写风格自检
+6. 逐条编写 16 列，**步骤与预期结果尽量详细**，对照编写指导 §3、归属判据与 CSV 书写风格自检
 7. 写入 CSV → 执行 `node scripts/ensure-bom.cjs <CSV路径>` 确保带 UTF-8 BOM（见「CSV 书写」）→ 输出覆盖摘要（含 DFX 类型映射表，及相对 FIT 的切分说明）与质量自检
 
 ## 质量自检
@@ -172,14 +177,14 @@ case_id,type,module,title,precondition,steps,expected_result,priority,language_p
 - [ ] 已对照归属判据与编写指导 §1–§3（含 §2.1–§2.7 核心验证目标与通用校验点）与样例 CSV 的列结构、序号与书写风格
 - [ ] 用户已提供至少一项特性材料；未编造材料中不存在的接口/指标/运维能力
 - [ ] **无 FIT 越界**：不以业务结果为唯一断言；非法输入只断言可诊断性；配置变更只断言运维/可测试性机制
-- [ ] 每条 `type` 为 DFT/DFD/DFS/DFR/DFP/DFNS/DFC 之一，且与 case_id 中的 DFX 简写一致
-- [ ] case_id 唯一，格式 `DFX-<模块缩写>-<3位序号>`；title ≤50 字且无大量相互包含
-- [ ] 前置条件含环境要素明确化；步骤、预期符合指导 §3（序号、`见结果N`、可客观判定）
+- [ ] 每条备注含 `DFX类型:DFx`（DFT/DFD/DFS/DFR/DFP/DFNS/DFC 之一），且「用例类型」列按映射表填写、与 DFX 类型一致
+- [ ] 用例编号唯一，格式 `DFX-<feature>-<topic>-<3位序号>`；用例名称 ≤50 字且无大量相互包含
+- [ ] 前置条件含环境要素明确化；步骤末步为清理动作；步骤、预期符合指导 §3（序号、`见结果N`、可客观判定）
 - [ ] **步骤描述可执行**（含具体命令、路径、参数）；**预期结果详细**（含可核对的状态码、字段、日志、指标）
 - [ ] DFX 类型由特性分析得出，非机械凑齐七类；未覆盖类型已在覆盖摘要说明原因
-- [ ] `language_profile` 每条必填且为 python/java/js/shell 之一；`component_deps` 每条必填；A2A-T 用例 `protocol_primitive` 已填
+- [ ] 备注含必填键 `language_profile`（python/java/js/shell 之一）、`protocol_primitive`（A2A-T 用例已填原语）、`环境`、`执行策略`；第 5 列 `component_deps` 已填（none 或 openan 仓名）；P0/P1 行「可自动化」为「是」
 - [ ] 条数由覆盖推导，非模板固定
-- [ ] 里程碑未指定时 notes 未写；可选元数据未推断占位
+- [ ] 里程碑、需求链接、对应自动化用例、开发/测试负责人：用户未指定且材料未提供时均为空，缺口已列入信息缺口清单
 
 ## 调用示例
 
@@ -194,7 +199,7 @@ case_id,type,module,title,precondition,steps,expected_result,priority,language_p
 
 ## 执行指令（模型）
 
-1. **必须先读** 本 skill 下三份 reference：[FIT与DFX场景归属判据.md](references/FIT与DFX场景归属判据.md) + [DFX测试用例编写指导.md](references/DFX测试用例编写指导.md) + [registry-center-Agent注册-特性级集成测试用例.csv](references/registry-center-Agent注册-特性级集成测试用例.csv)。
+1. **必须先读** 本 skill 下三份 reference：[FIT与DFX场景归属判据.md](references/FIT与DFX场景归属判据.md) + [DFX测试用例编写指导.md](references/DFX测试用例编写指导.md) + [registry-center-Agent注册-DFX测试用例.csv](references/registry-center-Agent注册-DFX测试用例.csv)。
 2. 确认用户至少提供一项特性材料；未提供则停止并提示。
 3. 再读用户指定的提案/设计/接口/用户文档/源码/FIT 用例；用户若提供其它参考 CSV，以其作风格基准。
 4. 完成 DFX 类型适用性分析后，对照归属判据过滤候选用例；输出：信息缺口清单 → 覆盖策略摘要（含选用的 DFX 类型、未选用类型理由、相对 FIT 的切分）→ 写入 CSV → 执行 `scripts/ensure-bom.cjs` 补 UTF-8 BOM → 质量自检。

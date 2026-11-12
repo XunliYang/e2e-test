@@ -1,22 +1,40 @@
 ---
 name: test-cases-generator
-description: 编排 openAN 测试用例生成到自评审自更改的全流程：调用 feature-level-test-cases-gen / dfx-test-cases-gen 生成（或按评审报告修改），做 FIT/DFX 边界检查与跨表去重，调用 test-cases-reviewer 评审，不通过则按报告迭代修改，最多 3 轮，输出最终 12 列用例 CSV 与评审报告。用户要求测试用例全流程、生成并评审、FIT/DFX 生成到评审闭环，或运行 /test-cases-generator 时使用；必填输入缺失时 STOP 并列出缺失项。
+description: 编排 openAN 测试用例生成到自评审自更改的全流程：调用 feature-level-test-cases-gen / dfx-test-cases-gen 生成（或按评审报告修改），做 FIT/DFX 边界检查与跨表去重，调用 test-cases-reviewer 评审，不通过则按报告迭代修改，最多 3 轮，输出最终 16 列用例 CSV（openan 官方 15 列 + component_deps 独立列）与评审报告。用户要求测试用例全流程、生成并评审、FIT/DFX 生成到评审闭环，或运行 /test-cases-generator 时使用；必填输入缺失时 STOP 并列出缺失项。
 ---
 
 # Test Cases Generator（全流程编排）
 
 串联 **特性级集成测试用例生成**、**DFX 测试用例生成**、**FIT/DFX 边界检查与去重** 与 **测试用例评审**，形成「生成/修改 → 边界检查 → 评审 → 不通过则按报告修改」闭环。本 skill **不自行编写用例细则**，必须通过读取并执行子 skill 完成生成与评审；边界检查对照本目录归属判据执行。
 
+## 表格规范（openan 官方模板，生成与评审的统一基线）
+
+用例 CSV 固定为 **16 列**（openan 官方 15 列 + component_deps 独立列），表头顺序与 openan-itest `docs/templates/testcases-template.csv` 一致（唯一事实来源：[templates/case-template.csv](templates/case-template.csv)）：
+
+```csv
+里程碑,用例名称,用例编号,模块,component_deps,需求链接,用例类型,优先级,前置条件,步骤描述,预期结果,可自动化,对应自动化用例,开发负责人,测试负责人,备注
+```
+
+关键规则（详见各生成/评审子 skill）：
+
+- **用例编号**：`FIT-<feature>-<topic>-<3位序号>`（如 `FIT-registry-center-agentcard-001`）；DFX 用例为 `DFX-<feature>-<topic>-<3位序号>`（框架未定义 DFX 专项编号，沿用同模式）；外部 SIT 表为 `SIT-<scenario>-<number>`
+- **用例类型**：FIT 行填 `功能测试`/`异常测试`/`协议测试`；DFX 行按框架 §10 专项类别填 `可测试性测试`/`可诊断性测试`/`可运维性测试`/`可靠性测试`/`性能测试`/`压力测试`/`稳定性测试`/`安全测试`/`兼容性测试`，并在备注写 `DFX类型:DFx` 保持七维覆盖可追溯
+- **优先级**：P0/P1/P2；P0/P1 行「可自动化」必须为 `是`（框架 §8.1 TRR 准入要求 P0/P1 100% 自动化）
+- **清理动作**：步骤描述最后一步必须为清理动作（框架 §6.3），预期结果含对应可判定断言
+- **需求链接**：材料中的需求/Issue/PR 链接写入该列；材料未提供则留空并记入信息缺口清单（框架 §4.3.1 验收要求「需求链接齐备」）
+- **备注键**（`；` 分隔）：`设计方法:xxx`；DFX 行 `DFX类型:DFx`；每条必填 `language_profile:python|java|js|shell`、`protocol_primitive:none|Task-T|Notification-T|Negotiation-T|Authorization-T`（供 e2e-test-code-gen 直接消费）；第 5 列 `component_deps` 独立列填 `none` 或 openan 仓名（多个用 `|` 分隔）；`环境:<运行环境>`（框架 §6.4 environment 维度、§4.3.1 要求用例标注环境，如 `docker-compose`、`with-workload-cluster`、`online`、`offline`，供 CI 环境过滤）；`执行策略:smoke|full|slow`（框架 §6.4 execution 维度，PR CI 跑 smoke、日构建跑 full）
+- 里程碑、开发/测试负责人、对应自动化用例：用户未指定时留空，禁止推断占位
+
 ## 子 Skill 路径（必须读取后执行）
 
-| 步骤 | Skill | 路径 |
+| 步骤 | Skill | 定位方式 |
 |------|-------|------|
-| FIT 生成/修改 | feature-level-test-cases-gen | [../feature-level-test-cases-gen/SKILL.md](../feature-level-test-cases-gen/SKILL.md) |
-| DFX 生成/修改 | dfx-test-cases-gen | [../dfx-test-cases-gen/SKILL.md](../dfx-test-cases-gen/SKILL.md) |
-| 用例评审 | test-cases-reviewer | [../test-cases-reviewer/SKILL.md](../test-cases-reviewer/SKILL.md) |
+| FIT 生成/修改 | feature-level-test-cases-gen | 本仓库 `skills/` 下对应目录；安装到 Agent 环境后可能带 `openan-` 前缀（`openan-feature-level-test-cases-gen`），按**技能名**定位其 `SKILL.md` |
+| DFX 生成/修改 | dfx-test-cases-gen | 同上（安装后可能为 `openan-dfx-test-cases-gen`） |
+| 用例评审 | test-cases-reviewer | 同上（安装后可能为 `openan-test-cases-reviewer`） |
 | FIT/DFX 边界检查 | （本 skill 执行） | [references/FIT与DFX场景归属判据.md](references/FIT与DFX场景归属判据.md) |
 
-调用某子 skill 前：**先用 Read 工具完整阅读其 `SKILL.md`**，再按其「执行指令」与输入/输出约定操作；禁止跳过子 skill 的强制 reference 阅读与质量自检。边界检查前必须先读本目录归属判据。
+调用某子 skill 前：**先用 Read 工具完整阅读其 `SKILL.md`**（路径为其技能目录下的 `SKILL.md`），再按其「执行指令」与输入/输出约定操作；禁止跳过子 skill 的强制 reference 阅读与质量自检。边界检查前必须先读本目录归属判据。
 
 ## 流程总览
 
@@ -47,9 +65,10 @@ description: 编排 openAN 测试用例生成到自评审自更改的全流程�
 |------|------|
 | **特性材料（至少其一，必填）** | 提案、设计、接口/API 文档、用户手册、目标仓库源码、既有 FIT 等；无材料则停止并提示补充 |
 | **生成范围（必填意向）** | `FIT` / `DFX` / `FIT+DFX`；用户未明示时根据诉求推断，无法推断则询问后再继续 |
-| **特性/模块名称（必填）** | 透传给子 skill 写入 `module` 列与文件命名；缺失则停止，禁止从材料推断 |
+| **特性/模块名称（必填）** | 透传给子 skill 写入「模块」列与文件命名；缺失则停止，禁止从材料推断 |
+| 需求链接（可选） | 需求/Issue/PR 链接清单（如 `https://github.com/project-openan/registry-center/issues/1`）；透传写入「需求链接」列。未指定时从材料提取；材料中亦无则该列留空并记入信息缺口清单 |
 | 目标仓库（可选） | 用于默认文件命名前缀（`<目标仓库>_<特性名称>…`）与源码定位；未给则命名不含该段 |
-| 里程碑（可选） | 用户指定版本（如 `v1.0`）时透传，子 skill 将其写入 notes `里程碑:v1.0`；未指定则不写 |
+| 里程碑（可选） | 用户指定版本（如 `v26.12`）时透传，子 skill 将其写入「里程碑」列；未指定则该列留空 |
 | 既有 FIT CSV | **透传**给 DFX 子 skill 做交叉去重；未指定则按子 skill 规则留空 |
 | 需求/设计材料（评审用） | 可选；透传给 reviewer 做文件级覆盖分析 |
 | **最终输出路径** | 可选；分别指定 FIT/DFX 最终 CSV 路径。未指定则基名为 `[<目标仓库>_]<特性名称>特性级集成测试用例` / `[<目标仓库>_]<特性名称>DFX测试用例`（**不含** `epoch-` 后缀） |
@@ -113,7 +132,8 @@ description: 编排 openAN 测试用例生成到自评审自更改的全流程�
 ```text
 【全流程编排 · epoch-N】
 - 模式：首次生成 | 按评审报告修改
-- 特性/模块名称：<用户指定，用于 module 列与文件命名>
+- 特性/模块名称：<用户指定，用于「模块」列与文件命名>
+- 需求链接：<用户指定或「从材料提取」>
 - 目标仓库：<用户指定或「无」>
 - 里程碑：<用户指定或「无」>
 - 上一轮用例：<path>
@@ -210,7 +230,9 @@ FIT+DFX：**两个范围均通过**（或已满 3 轮）才结束全流程。某
 
 ## 质量自检
 
-- [ ] 每轮 CSV 与最终交付 CSV 均为 UTF-8 带 BOM（`scripts/ensure-bom.cjs` 结果为 `[OK]`）
+- [ ] 每轮 CSV 与最终交付 CSV 均为 UTF-8 带 BOM（`scripts/ensure-bom.cjs` 结果为 `[OK]`），且为 16 列表头（顺序与 `templates/case-template.csv` 一致）
+- [ ] 用例编号符合 `FIT-/DFX-<feature>-<topic>-<3位序号>`；用例类型取值为规范枚举；备注含 `language_profile`/`protocol_primitive`/`环境`/`执行策略` 键；第 5 列 `component_deps` 已填（none 或 openan 仓名）
+- [ ] P0/P1 行「可自动化」为「是」；步骤描述末步为清理动作
 - [ ] 必填项（特性材料、生成范围、特性/模块名称）均已由用户给出后再执行；缺失未开跑
 - [ ] 已按范围完整执行对应生成 skill（含其强制 reference 与归属判据），未手写绕过
 - [ ] 每轮在评审前已做 FIT/DFX 边界检查（越界 + 适用时的跨表去重），报告已写入中间目录

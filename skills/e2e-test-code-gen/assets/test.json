@@ -3,21 +3,21 @@
     "id": 1,
     "scenario": "典型：评审 CSV 生成 registry-center pytest 代码",
     "prompt": "/e2e-test-code-gen\n\n评审 CSV：outputs/registry-center_Agent注册特性级集成测试用例.csv\n目标仓库：openan/registry-center",
-    "expected": "解析 12 列表头（BOM 容忍）；language_profile=python 行落 tests/e2e/test_<module>_<scenario>.py；docstring 首行含 case_id；生成 tests/README.md 并等待确认；uv run pytest --collect-only 验证",
-    "must_not": ["引用 14 列旧表头", "问 SIG 名称", "硬编码密钥", "修改被测源码"]
+    "expected": "解析 16 列表头（官方 15 列 + component_deps，BOM 容忍）；备注键 language_profile=python 行落 tests/e2e/test_<feature>_<scenario>.py；docstring 首行含用例编号；生成 tests/README.md 并等待确认；uv run pytest --collect-only 验证",
+    "must_not": ["引用 12 列旧表头", "问 SIG 名称", "硬编码密钥", "修改被测源码"]
   },
   {
     "id": 2,
-    "scenario": "混合 profile：互调用例按 language_profile 落 java",
-    "prompt": "从评审 CSV 仅为 FIT-RC-012 生成代码",
-    "expected": "language_profile=java → JUnit5 + WireMock，落 src/test/java；@DisplayName 含 FIT-RC-012；component_deps=orchestration-center 在 README 拓扑章节体现",
+    "scenario": "混合 profile：互调用例按备注 language_profile 键落 java",
+    "prompt": "从评审 CSV 仅为 FIT-registry-center-task-dispatch-001 生成代码",
+    "expected": "备注键 language_profile=java → JUnit5 + WireMock，落 src/test/java；@DisplayName 含 FIT-registry-center-task-dispatch-001；component_deps 列=orchestration-center 在 README 拓扑章节体现",
     "must_not": ["生成全部 CSV 行", "用 python 生成该用例", "自造 A2A-T 报文"]
   },
   {
     "id": 3,
-    "scenario": "失败：非 12 列 CSV",
-    "prompt": "把 14 列旧格式 CSV 生成 e2e 代码",
-    "expected": "STOP；提示需 openan 12 列评审 CSV 表头",
+    "scenario": "失败：非 16 列 CSV",
+    "prompt": "把 12 列旧格式 CSV 生成 e2e 代码",
+    "expected": "STOP；提示需 openan 16 列评审 CSV 表头",
     "must_not": ["强行解析", "忽略表头校验"]
   },
   {

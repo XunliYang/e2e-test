@@ -1,0 +1,51 @@
+﻿里程碑,用例名称,用例编号,模块,component_deps,需求链接,用例类型,优先级,前置条件,步骤描述,预期结果,可自动化,对应自动化用例,开发负责人,测试负责人,备注
+v26.12,DFX-registry-center-testability-001 - Health endpoint exposes readiness state for automated probing,DFX-registry-center-testability-001,registry-center,none,https://github.com/project-openan/registry-center/issues/14,可测试性测试,P0,"1、registry-center 已按 docker compose 部署
+2、健康探测端点路径已知（如 /health）","1、GET /health 调用健康探测端点 见结果1
+2、解析响应体中的就绪状态字段 见结果2
+3、清理：探测为只读操作，确认无遗留测试数据","1. 健康端点返回 200
+2. 就绪状态字段取值可被外部自动化识别（如 ready=true）
+3. 无遗留测试数据",是,,,,DFX类型:DFT；设计方法:场景法；校验点来源:DFX测试用例编写指导 §2.1；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:smoke
+v26.12,DFX-registry-center-diagnosability-001 - Failed registration emits ERROR log with error code and context,DFX-registry-center-diagnosability-001,registry-center,none,https://github.com/project-openan/registry-center/issues/15,可诊断性测试,P1,"1、registry-center 已部署且服务日志可通过 docker compose logs 读取
+2、已构造缺必填字段的非法 AgentCard payload","1、POST /v1/agents 提交非法 payload 触发注册失败
+2、docker compose logs 检索该次请求对应的服务端日志 见结果1
+3、查看服务错误计数/状态指标输出 见结果2
+4、清理：删除该次触发产生的残留测试数据（若有）","1. 服务日志出现对应 ERROR 级记录，含错误原因、Agent 名称与请求上下文
+2. 错误计数/指标相应递增，无静默失败
+3. 无残留测试数据",是,,,,DFX类型:DFD；设计方法:故障注入法；校验点来源:DFX测试用例编写指导 §2.2；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:full
+v26.12,DFX-registry-center-serviceability-001 - Externalized service config survives compose recreate,DFX-registry-center-serviceability-001,registry-center,none,https://github.com/project-openan/registry-center/issues/16,可运维性测试,P1,"1、registry-center 按 docker compose 部署且配置文件外置挂载
+2、已注册 1 个测试 Agent","1、修改外置配置文件中的日志级别配置 见结果1
+2、docker compose up -d --force-recreate 重建容器
+3、查询重建前注册的 Agent 并检查服务状态 见结果2
+4、清理：删除测试注册的 Agent","1. 配置外置生效，重建容器无需重新构建镜像
+2. 重建后服务正常运行，原注册 Agent 数据保持无丢失
+3. 清理后查询返回 404",是,,,,DFX类型:DFS；设计方法:场景法；校验点来源:DFX测试用例编写指导 §2.3；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:full
+v26.12,DFX-registry-center-reliability-001 - Service self-heals after registry-center container stop,DFX-registry-center-reliability-001,registry-center,none,https://github.com/project-openan/registry-center/issues/17,可靠性测试,P1,"1、registry-center 已部署且已注册至少 1 个 Agent
+2、docker compose 环境可用","1、记录当前已注册 Agent 列表
+2、docker compose stop registry-center 停止容器
+3、观察容器自动重启与服务恢复 见结果1
+4、查询停止前注册的 Agent 见结果2
+5、清理：删除测试注册的 Agent 数据","1. 容器被 compose restart 策略自动拉起，服务恢复运行
+2. 原注册 Agent 仍可查询、无数据丢失，同环境其他服务不受影响
+3. 清理后查询返回 404",是,,,,DFX类型:DFR；设计方法:故障注入法；校验点来源:DFX测试用例编写指导 §2.4；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:full
+v26.12,DFX-registry-center-performance-001 - Bulk registration of 100 agents completes within 30 seconds,DFX-registry-center-performance-001,registry-center,none,https://github.com/project-openan/registry-center/issues/18,性能测试,P2,"1、registry-center 已部署且 docker stats 可用
+2、测试 Agent 名称前缀已约定（perf-agent-）","1、循环注册 100 个 Agent 并记录总耗时 见结果1
+2、观测注册期间容器 CPU 与内存占用 见结果2
+3、分页查询确认注册总数 见结果3
+4、清理：批量删除 100 个测试 Agent 并确认总数清零","1. 100 个 Agent 注册总耗时不超过 30 秒
+2. 注册期间无内存持续上涨、无 OOM、无请求堆积报错
+3. 查询总数为 100，全部可检索
+4. 清理后 Agent 总数恢复注册前基线",是,,,,DFX类型:DFP；设计方法:正交试验法；校验点来源:DFX测试用例编写指导 §2.5；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:slow
+v26.12,DFX-registry-center-security-001 - Registration without valid auth token is rejected and audited,DFX-registry-center-security-001,registry-center,none,https://github.com/project-openan/registry-center/issues/19,安全测试,P0,"1、registry-center 已部署且开启鉴权模式
+2、有效测试 token 与无效 token 已准备","1、POST /v1/agents 不携带 Authorization 头 见结果1
+2、携带无效 token 再次调用注册接口 见结果2
+3、检索鉴权失败相关审计日志 见结果3
+4、清理：确认无 Agent 创建，删除残留测试数据（若有）","1. 返回 401/403，未创建 Agent
+2. 无效 token 请求被拦截，不执行业务逻辑
+3. 鉴权失败行为有审计日志记录
+4. 无残留测试数据",是,,,,DFX类型:DFNS；设计方法:错误推测法；校验点来源:DFX测试用例编写指导 §2.6；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:smoke
+v26.12,DFX-registry-center-compatibility-001 - Registration payload with unknown extra fields stays backward compatible,DFX-registry-center-compatibility-001,registry-center,none,https://github.com/project-openan/registry-center/issues/20,兼容性测试,P2,"1、registry-center 当前版本已部署
+2、已准备合法 AgentCard payload","1、POST /v1/agents 携带合法 payload 并附加未知扩展字段 见结果1
+2、GET /v1/agents/{name} 查询该 Agent 校验已知字段 见结果2
+3、清理：删除本次注册的 Agent","1. 返回 201，未知扩展字段不影响注册成功（向后兼容）
+2. 查询返回的已知字段与提交内容一致
+3. 清理后查询返回 404",是,,,,DFX类型:DFC；设计方法:场景法；校验点来源:DFX测试用例编写指导 §2.7；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:full

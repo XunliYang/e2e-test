@@ -6,13 +6,13 @@
 
 ## 测试范围
 
-| case_id | 验证内容 | 类型 | 优先级 | 状态 |
+| 用例编号 | 验证内容 | 类型 | 优先级 | 状态 |
 | --- | --- | --- | --- | --- |
-| <FIT-RC-001> | <一句话验证点> | FIT | P0 | ✅ 稳定 |
+| <FIT-registry-center-agentcard-001> | <一句话验证点> | 功能测试 | P0 | ✅ 稳定 |
 
 ### 按测试文件分类（多文件时）
 
-| 文件 | 覆盖 case_id | 说明 |
+| 文件 | 覆盖用例编号 | 说明 |
 | --- | --- | --- |
 | `<test_xxx.py / XxxTest.java / xxx.spec.ts / xxx.bats>` | <编号列表> | <职责> |
 
@@ -22,7 +22,7 @@
 
 ```text
 tests/
-├── <按 profile 约定>           # 测试源码（文件头注明来源 CSV 与 case_id）
+├── <按 profile 约定>           # 测试源码（文件头注明来源 CSV 与用例编号）
 ├── fixtures/ 或 assets/        # 测试数据（互操作样本用 a2a-t-corpus 既有目录）
 └── README.md                   # 本文件
 ```
@@ -73,8 +73,11 @@ teardown 阶段：
 # 全部
 <profile 运行命令>
 
-# 按 case_id 过滤
+# 按用例编号过滤
 <profile 过滤命令，如 pytest -k / --grep / -Dtest>
+
+# 按执行策略过滤（备注 执行策略 键 smoke/full/slow 已映射为标记）
+<如 pytest -m smoke / npx playwright test --grep @smoke>
 ```
 
 最小验证（交付前必过）：<collect-only / test-compile / vitest run / bats --count 命令>

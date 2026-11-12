@@ -1,34 +1,53 @@
-﻿case_id,type,module,title,precondition,steps,expected_result,priority,language_profile,component_deps,protocol_primitive,notes
-FIT-RC-001,FIT,registry-center,服务部署与健康检查就绪,"1、registry-center 源码已构建镜像
+﻿里程碑,用例名称,用例编号,模块,component_deps,需求链接,用例类型,优先级,前置条件,步骤描述,预期结果,可自动化,对应自动化用例,开发负责人,测试负责人,备注
+v26.12,FIT-registry-center-service-startup-001 - Deploy service and pass health check,FIT-registry-center-service-startup-001,registry-center,none,https://github.com/project-openan/registry-center/issues/1,功能测试,P0,"1、registry-center 源码已构建镜像
 2、docker-compose 环境可用","1、在 registry-center 目录执行 docker compose up -d 启动服务
-2、执行 curl http://localhost:8080/health 检查健康状态 见结果1","1. 返回 200 且响应体 status 为 ok",P0,python,none,none,设计方法:场景法
-FIT-RC-002,FIT,registry-center,注册合法Agent成功,1、registry-center 服务已启动且健康检查通过,"1、准备合法 Agent payload（name/agent_type/capabilities/endpoint）
-2、POST /v1/agents 提交注册请求
-3、GET /v1/agents/{id} 查询注册结果 见结果1","1. 注册返回 201，且可通过 GET 查询到该 Agent，各字段与 payload 一致",P0,python,none,none,设计方法:等价类划分
-FIT-RC-003,FIT,registry-center,按分页查询Agent列表,"1、registry-center 服务已启动
-2、已注册 3 个以上 Agent",1、GET /v1/agents?page=1&page_size=2 查询列表 见结果1,"1. 返回 200，本页返回 2 条记录，total 为实际注册数量",P0,python,none,none,设计方法:等价类划分
-FIT-RC-004,FIT,registry-center,更新Agent功能配置后查询生效,"1、registry-center 服务已启动
+2、执行 curl http://localhost:8080/health 检查健康状态 见结果1
+3、清理：执行 docker compose down 停止并移除服务","1. 返回 200 且响应体 status 为 ok
+2. 服务停止后容器不存在",是,,,,设计方法:场景法；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:smoke
+v26.12,FIT-registry-center-agentcard-001 - Register a valid agent successfully,FIT-registry-center-agentcard-001,registry-center,none,https://github.com/project-openan/registry-center/issues/2,功能测试,P0,1、registry-center 服务已启动且健康检查通过,"1、准备合法 Agent payload（name/agent_type/capabilities/endpoint）
+2、POST /v1/agents 提交注册请求 见结果1
+3、清理：DELETE /v1/agents/{id} 删除注册的 Agent","1. 注册返回 201，且可通过 GET 查询到该 Agent，各字段与 payload 一致
+2. 删除返回 204，再次查询返回 404",是,,,,设计方法:等价类划分；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:smoke
+v26.12,FIT-registry-center-agentcard-002 - Query agent list with pagination,FIT-registry-center-agentcard-002,registry-center,none,https://github.com/project-openan/registry-center/issues/3,功能测试,P0,"1、registry-center 服务已启动
+2、已注册 3 个以上 Agent","1、GET /v1/agents?page=1&page_size=2 查询列表 见结果1
+2、清理：删除前置条件中注册的测试 Agent 数据","1. 返回 200，本页返回 2 条记录，total 为实际注册数量
+2. 清理后列表不再包含测试 Agent",是,,,,设计方法:等价类划分；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:smoke
+v26.12,FIT-registry-center-agentcard-003 - Updated agent config takes effect on query,FIT-registry-center-agentcard-003,registry-center,none,https://github.com/project-openan/registry-center/issues/4,功能测试,P0,"1、registry-center 服务已启动
 2、已注册一个 Agent","1、PUT /v1/agents/{id} 更新 capabilities 与 endpoint 为新值
-2、GET /v1/agents/{id} 查询该 Agent 见结果1","1. 更新返回 200，查询返回的 capabilities 与 endpoint 为新值",P0,python,none,none,设计方法:场景法
-FIT-RC-005,FIT,registry-center,注销Agent后查询返回不存在,"1、registry-center 服务已启动
+2、GET /v1/agents/{id} 查询该 Agent 见结果1
+3、清理：DELETE /v1/agents/{id} 删除该 Agent","1. 更新返回 200，查询返回的 capabilities 与 endpoint 为新值
+2. 删除返回 204",是,,,,设计方法:场景法；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:smoke
+v26.12,FIT-registry-center-agentcard-004 - Deregistered agent returns 404 on query,FIT-registry-center-agentcard-004,registry-center,none,https://github.com/project-openan/registry-center/issues/5,功能测试,P0,"1、registry-center 服务已启动
 2、已注册一个 Agent","1、DELETE /v1/agents/{id} 注销该 Agent
-2、GET /v1/agents/{id} 再次查询 见结果1","1. 注销返回 204，再次查询返回 404",P0,python,none,none,设计方法:状态迁移法
-FIT-RC-006,FIT,registry-center,Agent状态上报后端到端可见,"1、registry-center 服务已启动
+2、GET /v1/agents/{id} 再次查询 见结果1","1. 注销返回 204，再次查询返回 404",是,,,,设计方法:状态迁移法；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:smoke
+v26.12,FIT-registry-center-agent-status-001 - Agent status report is visible end to end,FIT-registry-center-agent-status-001,registry-center,none,https://github.com/project-openan/registry-center/issues/6,功能测试,P0,"1、registry-center 服务已启动
 2、已注册一个 Agent","1、POST /v1/agents/{id}/status 上报状态为 online
-2、GET /v1/agents/{id} 查询该 Agent 状态 见结果1","1. 上报返回 200，查询返回的 status 为 online",P0,python,none,none,设计方法:状态迁移法
-FIT-RC-007,FIT,registry-center,并发注册不同IDAgent结果正确,1、registry-center 服务已启动,"1、并发提交 10 个不同 id 的 Agent 注册请求
-2、逐一 GET /v1/agents/{id} 查询 见结果1","1. 全部返回 201，且 10 个 Agent 均可查询到，字段互不串扰",P1,python,none,none,设计方法:错误推测法
-FIT-RC-008,FIT,registry-center,重复注册相同IDAgent按规格幂等,"1、registry-center 服务已启动
-2、已注册 id 为 agent-dup 的 Agent",1、以相同 id、相同 payload 再次 POST /v1/agents 见结果1,"1. 按规格返回幂等成功（200/201 之一，以规格为准），不产生重复记录",P1,python,none,none,设计方法:错误推测法
-FIT-RC-009,FIT,registry-center,空名称Agent注册被校验拒绝,1、registry-center 服务已启动,"1、准备 name 为空字符串的 payload
-2、POST /v1/agents 提交注册请求 见结果1","1. 返回 400/422，错误消息指出 name 不能为空，不产生注册记录",P2,python,none,none,设计方法:等价类划分
-FIT-RC-010,FIT,registry-center,Agent名称长度边界注册,"1、registry-center 服务已启动
-2、规格规定名称长度上限 63 字符","1、分别以 63 字符与 64 字符名称注册 Agent 见结果1","1. 63 字符注册成功；64 字符返回 400/422 长度超限",P2,python,none,none,设计方法:边界值分析
-FIT-RC-011,FIT,registry-center,查询不存在Agent返回404,1、registry-center 服务已启动,1、GET /v1/agents/agent-not-exist 查询 见结果1,"1. 返回 404，错误消息指出 Agent 不存在",P2,python,none,none,设计方法:错误推测法
-FIT-RC-012,FIT,registry-center,跨组件任务下发经注册中心发现Agent,"1、registry-center 与 orchestration-center 已通过 docker compose 启动
+2、GET /v1/agents/{id} 查询该 Agent 状态 见结果1
+3、清理：DELETE /v1/agents/{id} 删除该 Agent","1. 上报返回 200，查询返回的 status 为 online
+2. 删除返回 204",是,,,,设计方法:状态迁移法；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:smoke
+v26.12,FIT-registry-center-concurrency-001 - Concurrent registration of distinct agent IDs returns correct results,FIT-registry-center-concurrency-001,registry-center,none,https://github.com/project-openan/registry-center/issues/7,功能测试,P1,1、registry-center 服务已启动,"1、并发提交 10 个不同 id 的 Agent 注册请求
+2、逐一 GET /v1/agents/{id} 查询 见结果1
+3、清理：逐一 DELETE 删除 10 个测试 Agent","1. 全部返回 201，且 10 个 Agent 均可查询到，字段互不串扰
+2. 全部删除返回 204",是,,,,设计方法:错误推测法；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:full
+v26.12,FIT-registry-center-agentcard-005 - Duplicate registration with same ID is idempotent per spec,FIT-registry-center-agentcard-005,registry-center,none,https://github.com/project-openan/registry-center/issues/8,功能测试,P1,"1、registry-center 服务已启动
+2、已注册 id 为 agent-dup 的 Agent","1、以相同 id、相同 payload 再次 POST /v1/agents 见结果1
+2、清理：DELETE /v1/agents/agent-dup 删除该 Agent","1. 按规格返回幂等成功（200/201 之一，以规格为准），不产生重复记录
+2. 删除返回 204",是,,,,设计方法:错误推测法；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:full
+v26.12,FIT-registry-center-agentcard-006 - Registration with empty agent name is rejected,FIT-registry-center-agentcard-006,registry-center,none,https://github.com/project-openan/registry-center/issues/9,异常测试,P2,1、registry-center 服务已启动,"1、准备 name 为空字符串的 payload
+2、POST /v1/agents 提交注册请求 见结果1","1. 返回 400/422，错误消息指出 name 不能为空，不产生注册记录",是,,,,设计方法:等价类划分；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:full
+v26.12,FIT-registry-center-agentcard-007 - Agent name length boundary registration,FIT-registry-center-agentcard-007,registry-center,none,https://github.com/project-openan/registry-center/issues/10,异常测试,P2,"1、registry-center 服务已启动
+2、规格规定名称长度上限 63 字符","1、分别以 63 字符与 64 字符名称注册 Agent 见结果1
+2、清理：DELETE 删除注册成功的 63 字符名称 Agent","1. 63 字符注册成功；64 字符返回 400/422 长度超限
+2. 删除返回 204",是,,,,设计方法:边界值分析；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:full
+v26.12,FIT-registry-center-agentcard-008 - Query non-existent agent returns 404,FIT-registry-center-agentcard-008,registry-center,none,https://github.com/project-openan/registry-center/issues/11,异常测试,P2,1、registry-center 服务已启动,1、GET /v1/agents/agent-not-exist 查询 见结果1,"1. 返回 404，错误消息指出 Agent 不存在",是,,,,设计方法:错误推测法；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:full
+v26.12,FIT-registry-center-task-dispatch-001 - Cross-component task dispatch discovers agent via registry center,FIT-registry-center-task-dispatch-001,registry-center,orchestration-center,https://github.com/project-openan/registry-center/issues/12,协议测试,P1,"1、registry-center 与 orchestration-center 已通过 docker compose 启动
 2、已注册一个 Agent","1、orchestration-center 调用注册中心查询接口发现目标 Agent
-2、向该 Agent 下发 A2A-T 任务 见结果1","1. 发现接口返回目标 Agent endpoint，任务下发按 A2A-T 规格被接收",P1,java,orchestration-center,Task-T,设计方法:场景法；跨语言互调用例按测试落地方标注language_profile
-FIT-RC-013,FIT,registry-center,registry-center进程重启后已注册Agent数据保持,"1、registry-center 服务已启动
+2、向该 Agent 下发 A2A-T 任务 见结果1
+3、清理：删除测试 Agent 与任务数据","1. 发现接口返回目标 Agent endpoint，任务下发按 A2A-T 规格被接收
+2. 清理后查询无残留",是,,,,设计方法:场景法；环境:docker-compose；language_profile:java；protocol_primitive:Task-T；执行策略:full；跨语言互调用例按测试落地方标注language_profile
+v26.12,FIT-registry-center-service-restart-001 - Registered agent data persists after service restart,FIT-registry-center-service-restart-001,registry-center,none,https://github.com/project-openan/registry-center/issues/13,功能测试,P1,"1、registry-center 服务已启动
 2、已注册 2 个 Agent","1、记录当前 Agent 列表
 2、重启 registry-center 容器
-3、重启后再次查询 Agent 列表 见结果1","1. 2 个 Agent 仍可查询到，数据无丢失",P1,python,none,none,设计方法:场景法；本条仅示范重启场景的书写风格，自愈/重启恢复归DFR，新生成不得写入FIT
+3、重启后再次查询 Agent 列表 见结果1
+4、清理：删除 2 个测试 Agent","1. 2 个 Agent 仍可查询到，数据无丢失
+2. 删除返回 204",是,,,,设计方法:场景法；环境:docker-compose；language_profile:python；protocol_primitive:none；执行策略:full；本条仅示范重启场景的书写风格，自愈/重启恢复归DFR，新生成不得写入FIT

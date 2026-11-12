@@ -24,7 +24,7 @@ tests/
 
 - 文件：`test_<module>_<scenario>.py`
 - 用例：`test_<action>_<expected_outcome>`
-- 标记：`@pytest.mark.unit` / `@pytest.mark.integration` / `@pytest.mark.e2e`，用例 ID 写入 docstring 首行，如 `"""FIT-RC-001: 注册合法 Agent 成功"""`
+- 标记：`@pytest.mark.unit` / `@pytest.mark.integration` / `@pytest.mark.e2e`，用例 ID 写入 docstring 首行，如 `"""FIT-registry-center-agentcard-001: 注册合法 Agent 成功"""`
 
 ## 关键模式
 
@@ -47,7 +47,7 @@ async def client(monkeypatch):
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_register_agent_success(client):
-    """FIT-RC-001: 注册合法 Agent 成功"""
+    """FIT-registry-center-agentcard-001: 注册合法 Agent 成功"""
     resp = await client.post("/v1/agents", json={"name": "fault-mgmt-agent"})
     assert resp.status_code == 201
 ```

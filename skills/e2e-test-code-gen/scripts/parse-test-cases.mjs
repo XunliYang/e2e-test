@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 /**
- * Parse openan 12-column test case CSV and output codegen input JSON.
+ * Parse openan test case CSV (16 columns: official 15 + component_deps) and output codegen input JSON.
+ * Orchestration keys are read from the 备注 column (language_profile /
+ * protocol_primitive / 执行策略 / 环境 / DFX类型); component_deps is column 5.
  * Usage: node parse-test-cases.mjs <csv-path> [--ids id1,id2] [--priority P0,P1]
  * Exit codes: 0 = cases found; 1 = usage/parse error; 2 = zero cases after filters.
  */
@@ -49,7 +51,7 @@ const format = detectCsvFormat(headers);
 
 if (format !== FORMAT_OPENAN) {
   console.error(
-    `[e2e-code-gen] ERROR: CSV must use the openan 12-column header (BOM tolerated). Expected:\n  ${CASE_HEADERS.join(',')}`
+    `[e2e-code-gen] ERROR: CSV must use the openan 16-column header (official 15 + component_deps; BOM tolerated). Expected:\n  ${CASE_HEADERS.join(',')}`
   );
   process.exit(1);
 }
@@ -65,7 +67,7 @@ for (const raw of rawRows) {
   if (priority.length && !priority.includes(n.priority)) continue;
 
   if (!shouldIncludeRow(n)) {
-    skipped.push({ case_id: caseId, reason: 'type 不在可生成范围（FIT/DFT/DFD/DFS/DFR/DFP/DFNS/DFC）', name: n.name });
+    skipped.push({ case_id: caseId, reason: '用例类型不在可生成范围（功能测试/异常测试/协议测试或备注含 DFX类型）', name: n.name });
     continue;
   }
   if (!isValidLanguageProfile(n.language_profile)) {
@@ -77,13 +79,20 @@ for (const raw of rawRows) {
     case_id: caseId,
     case_id_slug: n.case_id_slug,
     type: n.type,
+    case_type: n.case_type,
     module: n.module,
     name: n.name,
     priority: n.priority,
     language_profile: n.language_profile,
     component_deps: n.component_deps,
     protocol_primitive: n.protocol_primitive,
+    execution_strategy: n.execution_strategy,
+    environment: n.environment,
+    dfx_type: n.dfx_type,
     milestone: n.milestone,
+    requirement_link: n.requirement_link,
+    automatable: n.automatable,
+    auto_case_ref: n.auto_case_ref,
     entry_type: inferEntryType(n),
     scenario: n.scenario,
     notes: n.notes,

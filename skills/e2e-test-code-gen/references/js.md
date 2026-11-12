@@ -21,7 +21,7 @@ playwright.config.ts                  # E2E 配置（baseURL 走环境变量）
 ## 命名与标记
 
 - 单测文件：`*.test.ts`，用例 `should <expected outcome> when <condition>`
-- Playwright：`e2e/<feature>.spec.ts`，用例 ID 写在 `test.describe` 或 `test()` 标题中，如 `test("FIT-PT-001: 登录后展示 Agent 市场", ...)`
+- Playwright：`e2e/<feature>.spec.ts`，用例 ID 写在 `test.describe` 或 `test()` 标题中，如 `test("FIT-marketplace-agentcard-001: 登录后展示 Agent 市场", ...)`
 - 用例标题统一英文短句，报告展示更友好
 
 ## 关键模式
@@ -38,7 +38,7 @@ afterAll(() => server.close())
 ```ts
 // Playwright E2E
 import { test, expect } from '@playwright/test'
-test('FIT-PT-001: 登录后展示 Agent 市场', async ({ page }) => {
+test('FIT-marketplace-agentcard-001: 登录后展示 Agent 市场', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('link', { name: 'Agent Market' })).toBeVisible()
 })
@@ -52,7 +52,7 @@ test('FIT-PT-001: 登录后展示 Agent 市场', async ({ page }) => {
 ```bash
 npm run test               # Vitest
 npx playwright test        # E2E
-npx playwright test --grep "FIT-PT-001"
+npx playwright test --grep "FIT-marketplace-agentcard-001"
 npx playwright show-report
 ```
 
